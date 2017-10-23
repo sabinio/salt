@@ -7,7 +7,7 @@ AUTHOR: Richie Lee
 This module is designed to take a SQL Agent Job that is stored in an XML file and deploy the job to an instance of SQL. The PowerShell is idempotent in that if it is re-run on the same XML file then no changesa re applied. Only when there are changes in the XML file will we see changes.
 Each one of the modules used have their own documentation in their header. This readme will attempt to exapnd upon that documentation. It is strongly encouraged that you read that documentation.
 
-##Why is SQL Agent Stored in an XML File?
+## Why is SQL Agent Stored in an XML File?
 
 There is no obvious way to script out in T-SQL an alter statement to apply changes to a SQL Agent account. This module makes use of SMO to apply changes, as it is far more powerful and flexible. Therefore we have to present the properties of a SQL Agent job in a way that we can then map those to the corresponding methods to add/edit said properties of a given SQL Agent Job. XML proved to be a suitable method of storing all the properties in a strucuted way.
 Please refer to [MSDN](https://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.agent.job.aspx) for full information on SQLAgent and SMO. This is not required reading; more of a reference to the module. 
@@ -101,9 +101,9 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
 
 Several changes are required. Any elements that need changing will have an attribute called "Include." The elements that have an Include attribute are as follows - 
 
-TargetServer
-SSISServer
-SSISServerDetails - **SSISServerDetails is a special case and only needs to be updated if the ssis package exist in a different folder/project/environment from other environments. This should not be the case and is an edge case. If you do have your packages in different folders etc it may be more sensible for each environment to mirror one another.**
+**TargetServer**
+**SSISServer**
+**SSISServerDetails** - *SSISServerDetails is a special case and only needs to be updated if the ssis package exist in a different folder/project/environment from other environments. This should not be the case and is an edge case. If you do have your packages in different folders etc it may be more sensible for each environment to mirror one another.*
 
 Let's take TargetServer as an example - When running a deploy, in the PowerShell session there needs to be a variable with the exact same name that the value of "Include" is. If you are running this locally then you would just create a variable of that given name. Here is an example:
 Say my TargetServer is defined as below:
