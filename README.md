@@ -102,7 +102,9 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
 Several changes are required. Any elements that need changing will have an attribute called "Include." The elements that have an Include attribute are as follows - 
 
 **TargetServer**
+
 **SSISServer**
+
 **SSISServerDetails** - *SSISServerDetails is a special case and only needs to be updated if the ssis package exist in a different folder/project/environment from other environments. This should not be the case and is an edge case. If you do have your packages in different folders etc it may be more sensible for each environment to mirror one another.*
 
 Let's take TargetServer as an example - When running a deploy, in the PowerShell session there needs to be a variable with the exact same name that the value of "Include" is. If you are running this locally then you would just create a variable of that given name. Here is an example:
