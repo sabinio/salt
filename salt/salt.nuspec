@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+<metadata>
+<id>salt</id>
+<version>1.0.0.0</version>
+<authors>Richie Lee</authors>
+<description>SQL Agent Deploy PowerShell Module</description>
+</metadata>
+<files>
+<file src="..\readme.md"/>
+<file src="salt.psd1"/>
+<file src="salt.psm1"/>
+<file src="functions\DisableJob.ps1" target="functions"/>
+<file src="functions\DisableJobNotifications.ps1" target="functions"/>
+<file src="functions\DisableJobSchedules.ps1" target="functions"/>
+<file src="functions\EnableJob.ps1" target="functions"/>
+<file src="functions\EnableJobSchedules.ps1" target="functions"/>
+<file src="functions\ConnectSqlConnection.ps1" target="functions"/>
+<file src="functions\DisconnectSqlConnection.ps1" target="functions"/>
+<file src="functions\GetFrequencyIntervalValue.ps1" target="functions"/>
+<file src="functions\GetDaysOfWeek.ps1" target="functions"/>
+<file src="functions\GetGoToStepId.ps1" target="functions"/>
+<file src="functions\GetGoToStepName.ps1" target="functions"/>
+<file src="functions\GetJob.ps1" target="functions"/>
+<file src="functions\GetJobCurrentRunStatus.ps1" target="functions"/>
+<file src="functions\GetSumUp.ps1" target="functions"/>
+<file src="functions\GetSqlAgentAsXml.ps1" target="functions"/>
+<file src="functions\GetXml.ps1" target="functions"/>
+<file src="functions\SetIscVariables.ps1" target="functions"/>
+<file src="functions\SetJob.ps1" target="functions"/>
+<file src="functions\SetJobCategory.ps1" target="functions"/>
+<file src="functions\SetJobOperator.ps1" target="functions"/>
+<file src="functions\SetJobSchedules.ps1" target="functions"/>
+<file src="functions\SetJobSteps.ps1" target="functions"/>
+<file src="functions\TestJobIsIdle.ps1" target="functions"/>
+</files>
+</package>
