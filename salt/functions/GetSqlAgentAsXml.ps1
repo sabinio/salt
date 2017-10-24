@@ -1,5 +1,5 @@
 Function Get-SqlAgentAsXml {
-     <#
+    <#
 .Synopsis
 Takes a SQL Agent Job that exists on a SQL Instance and converts into XML
 .Description
@@ -37,7 +37,7 @@ If not included all SQL Agent Jobs will be exported, except for the following:
         [ValidateNotNullorEmpty()]
         $filePath
     )
-    if ($jobName){
+    if ($jobName) {
         $serverJobs = $sqlserver.JobServer.Jobs |where-object {$_.Name -eq $jobName}
     }
     else {
@@ -115,30 +115,28 @@ If not included all SQL Agent Jobs will be exported, except for the following:
             elseif ($serverJobSchedule.Frequencytypes -eq "Monthly" -or $serverJobSchedule.Frequencytypes -eq "Daily") {
                 $xmlWriter.WriteElementString("Interval", "$($serverJobSchedule.FrequencyInterval)")
             }
-            if ($serverJobSchedule.FrequencyRecurrenceFactor -ge 2) {
-                $xmlWriter.WriteElementString("Recurrs", "$($serverJobSchedule.FrequencyRecurrenceFactor)")
-            }
+            $xmlWriter.WriteElementString("Recurrs", "$($serverJobSchedule.FrequencyRecurrenceFactor)")
             $xmlWriter.WriteEndElement() # <-- Closing FrequencyElement
-            if ($serverJobSchedule.FrequencyInterval -ne 0) {
-                $xmlWriter.WriteStartElement("DailyFrequency")
-                $xmlWriter.WriteElementString("Every", "$($serverJobSchedule.FrequencySubDayTypes)")
-                if ($serverJobSchedule.FrequencySubDayTypes -ne "Once") {
-                    $xmlWriter.WriteElementString("Interval", "$($serverJobSchedule.FrequencySubDayInterval)") 
-                }
-                $StartTimeSpan = $serverJobSchedule.ActiveStartTimeOfDay -split ":"
-                $EndTimeSpan = $serverJobSchedule.ActiveEndTimeOfDay -split ":"
-                $xmlWriter.WriteElementString("StartHour", "$($startTimeSpan[0])")
-                $xmlWriter.WriteElementString("StartMinute", "$($startTimeSpan[1])")
-                $xmlWriter.WriteElementString("StartSecond", "$($startTimeSpan[2])")
-                if ($serverJobSchedule.FrequencySubDayTypes -ne "Once") {
-                    $xmlWriter.WriteElementString("EndHour", "$($endTimeSpan[0])")
-                    $xmlWriter.WriteElementString("EndMinute", "$($endTimeSpan[1])")
-                    $xmlWriter.WriteElementString("EndSecond", "$($endTimeSpan[2])")
-                }
-                $xmlWriter.WriteEndElement() # <-- Closing ScheduleElement
-                $xmlWriter.WriteElementString("StartDate", "$(Get-Date $serverJobSchedule.ActiveStartDate -format yyyy-MM-dd)")
-                $xmlWriter.WriteElementString("EndDate", "$(Get-Date $serverJobSchedule.ActiveEndDate -format yyyy-MM-dd)")
+            $xmlWriter.WriteStartElement("DailyFrequency")
+            $xmlWriter.WriteElementString("Every", "$($serverJobSchedule.FrequencySubDayTypes)")
+            Write-Host $serverJobSchedule.FrequencySubDayTypes  -ForegroundColor DarkGreen
+            Write-Host $serverJobSchedule.FrequencySubDayInterval -ForegroundColor DarkMagenta
+            if ($serverJobSchedule.FrequencySubDayTypes -ne "Unknown") {
+                $xmlWriter.WriteElementString("Interval", "$($serverJobSchedule.FrequencySubDayInterval)") 
             }
+            $StartTimeSpan = $serverJobSchedule.ActiveStartTimeOfDay -split ":"
+            $EndTimeSpan = $serverJobSchedule.ActiveEndTimeOfDay -split ":"
+            $xmlWriter.WriteElementString("StartHour", "$($startTimeSpan[0])")
+            $xmlWriter.WriteElementString("StartMinute", "$($startTimeSpan[1])")
+            $xmlWriter.WriteElementString("StartSecond", "$($startTimeSpan[2])")
+            if ($serverJobSchedule.FrequencyTypes -ne "OneTime") {
+                $xmlWriter.WriteElementString("EndHour", "$($endTimeSpan[0])")
+                $xmlWriter.WriteElementString("EndMinute", "$($endTimeSpan[1])")
+                $xmlWriter.WriteElementString("EndSecond", "$($endTimeSpan[2])")
+            }
+            $xmlWriter.WriteEndElement() # <-- Closing ScheduleElement
+            $xmlWriter.WriteElementString("StartDate", "$(Get-Date $serverJobSchedule.ActiveStartDate -format yyyy-MM-dd)")
+            $xmlWriter.WriteElementString("EndDate", "$(Get-Date $serverJobSchedule.ActiveEndDate -format yyyy-MM-dd)")
             $xmlWriter.WriteEndElement() # <-- Closing ScheduleElement
             #Clear-Variable -Name "serverJobSchedule.Name"
             Clear-Variable -Name "serverJobSchedule"
