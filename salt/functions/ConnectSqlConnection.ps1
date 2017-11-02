@@ -1,5 +1,5 @@
 Function Connect-SqlConnection {
-     <#
+    <#
 .Synopsis
 create a connection to sql instance
 .Description
@@ -20,7 +20,16 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
     $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString        
     try {
         $SqlSvr = New-Object Microsoft.SqlServer.Management.Smo.Server $SqlConnection
+        foreach ($wargh in $SqlSvr.Databases) {
+            Write-Verbose $wargh.name | Out-Null
+        }
+        Write-Host "Name: " $SqlSvr.Name
+        Write-Host "Edition: " $SqlSvr.Edition
+        Write-Host "Build" $SqlSvr.BuildNumber
+        Write-Host "Version: " $SqlSvr.Version
+        Write-Host "ProductLevel: " $SqlSvr.ProductLevel 
         return $SqlSvr
+        
     }
     catch {
         Write-Error $_.Exception
