@@ -19,9 +19,11 @@ The structure can vary, depending on the Schedule and step type, but below is th
 		<Name></Name>                           	
 		<Description></Description>
 		<Enabled></Enabled>
-		<Category></Category>
+		<Category Include="">
+            <Value></Value>
+        </Category>
 		<TargetServers>
-			<TargetServer Include "">
+			<TargetServer Include="">
 				<Name></Name>
 			</TargetServer>
 		</TargetServers>
@@ -64,11 +66,19 @@ The structure can vary, depending on the Schedule and step type, but below is th
         <Step>
             <Name></Name>
             <SubSystem></SubSystem>
-            <SsisServerCatalog></SsisServerCatalog>
-            <SsisServerCatalogFolder></SsisServerCatalogFolder>
-            <SsisServerCatalogProject></SsisServerCatalogProject>
-            <SsisServerCatalogPackage></SsisServerCatalogPackage>
-            <Server></Server>
+            <RunAs Include="RunAsAccount">
+                <Name></Name>
+            </RunAs>
+            <SsisServer Include="IntegrationServicesCatalogServer">
+                <Name></Name>
+            </SsisServer>
+            <SsisServerDetails Include="">
+                <SsisServerCatalog></SsisServerCatalog>
+                <SsisServerCatalogFolder></SsisServerCatalogFolder>
+                <SsisServerCatalogProject></SsisServerCatalogProject>
+                <SsisServerCatalogPackage></SsisServerCatalogPackage>
+                <SsisServerCatalogEnvironment></SsisServerCatalogEnvironment>
+            </SsisServerDetails>
             <SsisServerCatalogEnvironment></SsisServerCatalogEnvironment>
             <OnSuccessAction></OnSuccessAction>
             <OnFailAction></OnFailAction>
@@ -100,6 +110,10 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
 ## Is There Anything That Needs to be Altered at Deploy Time?
 
 Several changes are required. Any elements that need changing will have an attribute called "Include." The elements that have an Include attribute are as follows - 
+
+* **Category**
+
+* **RunAs**
 
 * **TargetServer**
 
