@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 <metadata>
 <id>salt</id>
-<version>1.0.2.0</version>
+<version>1.0.2.1</version>
 <authors>Richie Lee</authors>
 <description>SQL Agent Deploy PowerShell Module</description>
 <dependencies>

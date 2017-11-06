@@ -27,7 +27,7 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
     )
     [string]$JobName = $root.Name
     $jobDescription = $root.Description
-    $jobCategory = $root.Category.Value.Value
+    $jobCategory = $root.Category.Value
     [bool]$JobEnabled = if ($root.Enabled -eq "True") {$True} else {$false} 
     $JobOperatorName = $root.Operator.Name
     $JobEmailLevel = $root.Notification.SendEmail
