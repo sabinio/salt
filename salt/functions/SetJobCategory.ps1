@@ -25,7 +25,23 @@ Set-JobCategory -SqlServer $SqlConnection -root $x
         [ValidateNotNullorEmpty()]
         $root
     )
-    $jobCategory = $root.Category
+    $keys = $($root.Category)
+    foreach ($var in $keys) {
+        $update = $var.Include
+        if (Test-Path variable:$update) {
+            [string]$value = Get-Variable $update -ValueOnly
+            Write-Verbose ('Setting category: {0} = {1}' -f $update, $value) -Verbose
+            $element = $root.SelectNodes("/Job/Category") | Where-Object {$_.Include -eq $update} 
+            $element.Value = $value
+        }
+        else {
+            $missingVariables += $update
+        }
+    }
+    if ($missingVariables.Count -gt 0) {
+        throw ('The variable {0} for Job Category is not defined in the current scope (but is defined in the xml). ' -f ($missingVariables -join " `n"))
+    }
+    $jobCategory = $root.Category.Value
     $ServerJobCategories = $SqlServer.JobServer.JobCategories | Select-Object -ExpandProperty Name
     if ($ServerJobCategories -notcontains $jobCategory) {
         $jc = new-object ('Microsoft.SqlServer.Management.Smo.Agent.JobCategory') ($SqlServer.JobServer, $jobCategory)

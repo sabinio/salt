@@ -13,7 +13,7 @@
     NestedModules = @()
  
     # Version number of this module.
-    ModuleVersion = '1.0.1.0'
+    ModuleVersion = '1.0.2.0'
  
     # ID used to uniquely identify this module
     GUID = '068b8176-32d3-486d-9dbf-77c45c7f8d4a'
