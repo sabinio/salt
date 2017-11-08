@@ -27,12 +27,20 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
         Write-Host "Edition: " $SqlSvr.Edition
         Write-Host "Build" $SqlSvr.BuildNumber
         Write-Host "Version: " $SqlSvr.Version
-        Write-Host "ProductLevel: " $SqlSvr.ProductLevel 
-        return $SqlSvr
-        
+        Write-Host "ProductLevel: " $SqlSvr.ProductLevel
     }
     catch {
         Write-Error $_.Exception
         Throw
     }
+    $JobServerExists = Test-SQLServerAgentService  -SmoObjectConnection $SqlSvr
+    if ($JobServerExists -eq 1) {
+        Write-Verbose "Job Server Is Up And Running!" -Verbose
+        return $SqlSvr
+    }
+    else {
+        Write-Error "Check that the Agent Service is running on $($sqlSvr.JobServer) and try again." -Verbose
+        Throw
+    }
 }
+   
