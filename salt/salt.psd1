@@ -77,7 +77,8 @@
        'Set-JobOperator',
        'Set-JobSchedules',
        'Set-JobSteps',
-       'Test-JobIsIdle'
+       'Test-JobIsIdle',
+       'Test-SQLServerAgentService'
     )
  
     # Cmdlets to export from this module
