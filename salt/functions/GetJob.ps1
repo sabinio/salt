@@ -28,7 +28,6 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
     [string]$JobName = $root.Name
     $job = new-object ('Microsoft.SqlServer.Management.Smo.Agent.Job')
     try {
-    
         $job = $SqlServer.JobServer.Jobs | Where-Object {$_.Name -eq $JobName}
         if ($null -eq $job) {
             Write-Warning "Job does not exist. This may be because this is the first run and job is not yet deployed."
