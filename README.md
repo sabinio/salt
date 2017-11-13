@@ -10,7 +10,7 @@ AUTHOR: Richie Lee
 ## Introduction
 
 This module is designed to take a SQL Agent Job that is stored in an XML file and deploy the job to an instance of SQL. The PowerShell is idempotent in that if it is re-run on the same XML file then no changesa re applied. Only when there are changes in the XML file will we see changes.
-Each one of the modules used have their own documentation in their header. This readme will attempt to exapnd upon that documentation. It is strongly encouraged that you read that documentation.
+Each one of the modules used have their own documentation in their header. This readme will attempt to exapnd upon that documentation. It is strongly encouraged that you read that documentation. 
 
 ## Why is SQL Agent Stored in an XML File?
 
@@ -187,3 +187,12 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
  ## Any Limitations?
 
  Other than the ones set by SQL Agent, not that I am aware of. By limitations I mean things like job names have to be unique, job schedule names don't have to be unique other than for the job itself etc.
+ 
+ ## What if I Want To Drop and Recreate The Job Every Time?
+ 
+ There is a Switch on the function "Set-Job" called "dropAndRecreate". This will drop the Job every time.
+ 
+ ```PowerShell
+$sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x -dropAndRecreate
+```
+ 
