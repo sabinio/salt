@@ -33,36 +33,44 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
     )
     
     [string]$JobName = $Job.Name
-    [int[]] $ScheduleIdentities = @()
+    $schedules = $root.Schedules
+    [System.Xml.XmlElement] $schedule = $null
+    $ServerResults = @{}
     try {
         $db = New-Object Microsoft.SqlServer.Management.Smo.Database
         $db = $SqlServer.Databases.Item("msdb")
-        $ds = $db.ExecuteWithResults("select s.schedule_id from sysjobs j
+        $ds = $db.ExecuteWithResults("select s.schedule_id, s.name from sysjobs j
     inner join sysjobschedules js on js.job_id = j.job_id
     inner join sysschedules s on s.schedule_id = js.schedule_id
     where j.name = '" + $jobName + "'") 
         $t = $ds.Tables[0]
         Foreach ($row in $t.Rows) {
-            $ScheduleIdentities += $row.schedule_id
+            $ServerResults.Add($row.name, $row.schedule_id)
         }
     }
     catch {
         throw $_.Exception
     }
-    $msg = "Dropping all schedules for job $jobname"
-    Write-Verbose $msg -Verbose
-    foreach ($ScheduleIdentity in $ScheduleIdentities) {
-        try {
-            $db.ExecuteNonQuery("EXEC dbo.sp_delete_schedule  
-        @schedule_id = '" + $ScheduleIdentity + "',  
+    if ($ServerResults.Count -gt 0) {
+        $msg = "Dropping all schedules for job $jobName that do not exist in XML..."
+        Write-Verbose $msg -Verbose
+        foreach ($ServerSchedule in $ServerResults.Keys) {
+            if ($schedules.schedule.name -notcontains $ServerSchedule) {
+                try {
+                    Write-Verbose "SQL Statement executed to drop schedule:" -Verbose
+                    Write-Verbose "EXEC dbo.sp_delete_schedule @schedule_id = '$($ServerResults.Get_Item($ServerSchedule)) ',@force_delete = 1;" -Verbose
+                    $db.ExecuteNonQuery("EXEC dbo.sp_delete_schedule  
+        @schedule_id = '" + $($ServerResults.Get_Item($ServerSchedule)) + "',  
         @force_delete = 1;")
-        }
-        catch {
-            throw $_.Exception
+                    $msg = "Schedule $($ServerSchedule) on job $jobName deleted..."
+                    Write-Verbose $msg -Verbose 
+                }
+                catch {
+                    throw $_.Exception
+                }
+            }
         }
     }
-    $schedules = $root.Schedules
-    [System.Xml.XmlElement] $schedule = $null
     foreach ($schedule in $schedules.ChildNodes) {
         #name of schedule
         [string]$schedule_name = $schedule.Name
@@ -90,7 +98,14 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
         [string]$Schedule_DailyFrequencyEndTimeSecond = $schedule.DailyFrequency.EndSecond 
         try {
             $js = new-object ('Microsoft.SqlServer.Management.Smo.Agent.JobSchedule') ($job, $schedule_name)
-            $create = $true
+            if ($ServerResults.Keys -notcontains $schedule_name){
+                $create = $true
+            }
+            else {
+                $create = $false
+                $js = $job.JobSchedules | Where-Object {$_.Name -eq $schedule_name}
+                $js.Refresh()
+            }
         }
         catch {
             throw $_.Exception
