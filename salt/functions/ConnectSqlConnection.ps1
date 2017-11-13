@@ -15,7 +15,8 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
     (
         [string]
         [ValidateNotNullorEmpty()]
-        $ConnectionString
+        $ConnectionString,
+        [Switch] $IgnoreCheck
     )
     $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString        
     try {
@@ -36,14 +37,19 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
         Write-Error $_.Exception
         Throw
     }
-    $JobServerExists = Test-SQLServerAgentService  -SmoObjectConnection $SqlSvr
-    if ($JobServerExists -eq 1) {
-        Write-Host "SQL Server Agent Job Service on $($SqlSvr.JobServer.Name) Is Up And Running!" -ForegroundColor White -BackgroundColor DarkCyan
-        return $SqlSvr
+    if (!$IgnoreCheck) {
+        $JobServerExists = Test-SQLServerAgentService  -SmoObjectConnection $SqlSvr
+        if ($JobServerExists -eq 1) {
+            Write-Host "SQL Server Agent Job Service on $($SqlSvr.JobServer.Name) Is Up And Running!" -ForegroundColor White -BackgroundColor DarkCyan
+            return $SqlSvr
+        }
+        else {
+            Write-Error "Check that the Agent Service is running on $($sqlSvr.JobServer) and try again."
+            Throw
+        }
     }
     else {
-        Write-Error "Check that the Agent Service is running on $($sqlSvr.JobServer) and try again."
-        Throw
+        return $SqlSvr
     }
 }
    

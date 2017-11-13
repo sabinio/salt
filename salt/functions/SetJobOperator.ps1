@@ -25,6 +25,11 @@ Set-JobOperator -SqlServer $SqlConnection -root $x
         $root
     )
     $JobOperatorName = $root.Operator.Name
+    if ($JobOperatorName.Length -eq 0)
+    {
+        Write-Verbose "No Operator Info in XML" -Verbose
+        Return
+    }
     $JobOperatorEMail = $root.Operator.EMail
     $JobOperatorPage = $root.Operator.Page
     $JobOperatorNetSend = $root.Operator.NetSend
