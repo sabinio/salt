@@ -193,6 +193,6 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
  There is a Switch on the function "Set-Job" called "dropAndRecreate". This will drop the Job every time.
  
  ```PowerShell
-$sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x dropAndRecreate
+$sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x -dropAndRecreate
 ```
  
