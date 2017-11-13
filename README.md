@@ -195,4 +195,8 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
  ```PowerShell
 $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x -dropAndRecreate
 ```
+ ## I Don't Want an Operator Created
+ 
+ If you don't want to include an operator, then leave it blank. The Function to set an operator checks to see if the name attribute is empty or not. If it is then it will skip creating an operator.
+ 
  
