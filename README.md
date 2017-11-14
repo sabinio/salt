@@ -236,5 +236,8 @@ Here is a list of the minimal permissions required if you are not going to attem
 
 If you wish to set the owner of the SQL Agent Job, then the account needs to be sysadmin. There are no minimal permissions. Set-JobOwner runs a check before attempting to change owner. 
 
+if you plan on only altering what was created through using salt, the permisisons granted by the role SQLAgentOpertorRole will be enough. If you are planning on changing objects already deployed that are owned by other accounts, and the account running hte deployment is NOT a sysmadin,  then you will need to manually alter those jobs/job schedules to be owned by the account that is runnning the deployment.
+[https://technet.microsoft.com/en-us/library/ms188283(v=sql.110).aspx](SQL Server Agent Fixed Database Roles) 
+
 ### Checking Permissions
-Assuming that you are using Integrated Security, you can run Test-CurrentPermissions, which will verify that the account executing deployment has the correct permissions on the server before executing. 
+Assuming that you are using Integrated Security, you can run Test-CurrentPermissions, which will verify that the account executing deployment has the correct minimum permissions on the server before executing. 
