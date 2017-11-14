@@ -27,6 +27,26 @@ Test-CurrentPermissions -SqlInstance $SqlSvr
     elseif($SQLSysAdminPermissions -eq 0)
     {
         Write-Verbose "user is not a member of the sysadmin sesrver role. Checking minimal permissions"
+        # /*
+        # USE msdb
+        # CREATE USER [asdf] FOR LOGIN [asdf]
+        # GO 
+        # GRANT SELECT ON dbo.sysschedules  TO [asdf]
+        # GRANT SELECT ON dbo.sysjobschedules  TO [asdf]
+        # GRANT SELECT ON dbo.sysjobs  TO [asdf]
+        # exec sp_addrolemember  @rolename = 'SQLAgentOperatorRole',  
+        #      @membername = 'asdf'  
+        # use master
+        # GO
+        
+        # CREATE USER [asdf] FOR LOGIN [asdf]
+        # GO
+        # GRANT SELECT ON master.dbo.sysprocesses  TO [asdf]
+        
+        # GRANT VIEW SERVER STATE TO [asdf]
+        
+        
+        # */
     }
     else{
         Write-Error "Unable to check permisions."
