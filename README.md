@@ -111,7 +111,26 @@ $SqlConnection = Connect-SqlConnection -ConnectionString $SqlConnectionString
 Get-SqlAgentAsXml -SqlServer $SqlConnection -filePath ".\" -JobName "Our First Job"
 Disconnect-SqlConnection -SqlDisconnect $SqlConnection
 ```
+## Does salt drop and recreate everything, or does it alter?
 
+salt will alter
+* Operator
+* Category
+* Job
+* Job Properties
+* Job Schedules
+
+salt will drop and recreate 
+* Job Steps
+
+### Why aren't Job Steps Altered?
+
+Job Steps are fiddly to work with in that they are not independent of themselves - they rely on other steps to exist. So easier to drop/recreate every time. 
+
+ ## What if I Want To Drop and Recreate The Job Every Time?
+ 
+ There is a Switch on the function "Set-Job" called "dropAndRecreate". This will drop the Job every time.
+ 
 ## Is There Anything That Needs to be Altered at Deploy Time?
 
 Several changes are required. Any elements that need changing will have an attribute called "Include." The elements that have an Include attribute are as follows - 
@@ -162,7 +181,7 @@ The process in PowerShell is outlined exactly above:
 * Import XML
 * Set Job Category - if it doesn't existwill create.
 * Set Job Operator - if it doesn't exist it will create, otherwise will update.
-* Set Job - if it doesn't exist will create, otherwise will update. Returns the SQL Agent Job as this is used by further functions.
+* Set Job - if it doesn't exist will create, otherwise will update. Inside this function we call other functions to set owner, notifications etc. Returns the SQL Agent Job as this is used by further functions.
 * Set Schedules - Will drop all schedules that relate to job and will create all jobs detailed in the XML.
 * Set Job Steps - Will drop all current job steps and will create all job steps defined in the XML.
 * Finally, Disconnect from SQL.
@@ -188,10 +207,6 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
 
  Other than the ones set by SQL Agent, not that I am aware of. By limitations I mean things like job names have to be unique, job schedule names don't have to be unique other than for the job itself etc.
  
- ## What if I Want To Drop and Recreate The Job Every Time?
- 
- There is a Switch on the function "Set-Job" called "dropAndRecreate". This will drop the Job every time.
- 
  ```PowerShell
 $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x -dropAndRecreate
 ```
@@ -204,3 +219,22 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x -dropAndRecreate
 In the function [Connect-SqlConnection](https://github.com/sabinio/salt/blob/master/salt/functions/ConnectSqlConnection.ps1) there is a check to verify that SQL Agent Service is up and running. As this requires access to master, and some accounts may not have permissions to master, you cna override this check by including the Switch "IgnoreCheck"
 
 Another check we have is that the connection to the instance is successful by querying all the database names and piping to "Out-Null". This is because of this [https://connect.microsoft.com/SQLServer/feedback/details/636401/smo-is-inconsistent-when-raising-errors-for-login-faliures#](Microsoft Connect Issue) where SMO is inconsistent with throwing login failures.
+
+## What Permissions Are Required on the SQL Server Instance?
+
+Here is a list of the minimal permissions required if you are not going to attempt to alter the owner of the job. 
+
+#### MSDB Database
+* GRANT SELECT on dbo.sysschedules
+* GRANT SELECT on dbo.sysjobschedules
+* GRANT SELECT on dbo.sysjobs
+* ROLE MEMBER of SQLAgentOperatorRole
+
+#### MASTER Database
+* GRANT SELECT on dbo.sysprocesses
+* GRANT VIEW SERVER STATE
+
+If you wish to set the owner of the SQL Agent Job, then the account needs to be sysadmin. There are no minimal permissions. Set-JobOwner runs a check before attempting to change owner. 
+
+### Checking Permissions
+Assuming that you are using Integrated Security, you can run Test-CurrentPermissions, which will verify that the account executing deployment has the correct permissions on the server before executing. 

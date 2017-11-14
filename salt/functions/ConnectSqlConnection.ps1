@@ -9,6 +9,8 @@ return connection
 The SQL Connection as a string that we use to make object SqlConnection
 .Parameter IgnoreCheck
 Ignores check in master database that SQL Agent Service is up and running 
+.Parameter CheckPermissions
+Checks permisions of the current user against instance of SQL being deployed to. 
 .Example
 Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
 Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True" -IgnoreCheck
@@ -19,7 +21,8 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True" -Ign
         [string]
         [ValidateNotNullorEmpty()]
         $ConnectionString,
-        [Switch] $IgnoreCheck
+        [Switch] $IgnoreCheck,
+        [Switch] $CheckPermissions
     )
     $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString        
     try {
@@ -39,6 +42,10 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True" -Ign
     catch {
         Write-Error $_.Exception
         Throw
+    }
+    if ($CheckPermissions){
+        Write-Verbose "Checking permissions of account running the deployment on the Instance $($SqlSvr.Name)" -Verbose
+        Test-CurrentPermissions -SqlInstance $SqlSvr
     }
     if (!$IgnoreCheck) {
         $JobServerExists = Test-SQLServerAgentService  -SmoObjectConnection $SqlSvr
