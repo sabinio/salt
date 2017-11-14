@@ -26,7 +26,7 @@ Test-CurrentPermissions -SqlInstance $SqlSvr
     }
     elseif($SQLSysAdminPermissions -eq 0)
     {
-        Write-Verbose "user is not a member ofhte sysadmin sesrver role. Checking minimal permissions"
+        Write-Verbose "user is not a member of the sysadmin sesrver role. Checking minimal permissions"
     }
     else{
         Write-Error "Unable to check permisions."
