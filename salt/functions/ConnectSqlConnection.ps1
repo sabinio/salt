@@ -7,8 +7,11 @@ Using sqldataclient.sqlconnection, create a connection to sql instance
 return connection
 .Parameter ConnectionString
 The SQL Connection as a string that we use to make object SqlConnection
+.Parameter IgnoreCheck
+Ignores check in master database that SQL Agent Service is up and running 
 .Example
 Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
+Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True" -IgnoreCheck
 #>
     [CmdletBinding()]
     param
@@ -43,9 +46,13 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True"
             Write-Host "SQL Server Agent Job Service on $($SqlSvr.JobServer.Name) Is Up And Running!" -ForegroundColor White -BackgroundColor DarkCyan
             return $SqlSvr
         }
-        else {
+
+        elseif($JobServerExists -eq 0) {
             Write-Error "Check that the Agent Service is running on $($sqlSvr.JobServer) and try again."
             Throw
+        }
+        else {
+            Write-Warning "Unable to check that the Agent Service is running on $($sqlSvr.JobServer). This may be a pmerissions issue on master.dbo.sysprocesses."
         }
     }
     else {
