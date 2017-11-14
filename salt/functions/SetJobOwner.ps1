@@ -7,7 +7,10 @@ Set the owner of the SQL Agent Job. If owner in xml is left blank job will set a
 Changing ownership of a job requires sysadmin permissions.
 .Parameter JobToAlter
 Job whose properties we will be altering.
+.Parameter SmoObjectConnection
+Connectio nto instance so we cna check if account running PowerShell has sysadmin permissions
 .Example
+Set-JobOwner -JobToAlter $JobToAlter -root $root -SmoObjectConnection $SmoObjectConnection
 #>
     [CmdletBinding()]
     param

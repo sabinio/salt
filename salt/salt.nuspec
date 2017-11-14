@@ -32,7 +32,10 @@
 <file src="functions\SetIscVariables.ps1" target="functions"/>
 <file src="functions\SetJob.ps1" target="functions"/>
 <file src="functions\SetJobCategory.ps1" target="functions"/>
+<file src="functions\SetJobNotification.ps1" target="functions"/>
 <file src="functions\SetJobOperator.ps1" target="functions"/>
+<file src="functions\SetJobOwner.ps1" target="functions"/>
+<file src="functions\SetJobProperties.ps1" target="functions"/>
 <file src="functions\SetJobSchedules.ps1" target="functions"/>
 <file src="functions\SetJobSteps.ps1" target="functions"/>
 <file src="functions\TestJobIsIdle.ps1" target="functions"/>

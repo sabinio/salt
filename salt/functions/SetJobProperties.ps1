@@ -6,7 +6,12 @@ Create or modify SQL Agent Job.
 SQL Agent Job will be created or updated to match the settings in the xml file.
 .Parameter JobToAlter
 Job whose properties we will be altering.
+.Parameter SmoObjectConnection
+Connection to instance - passed onto Set-JobOwner to check sysadmin permissions
 .Example
+$Job = Get-Job -SqlServer $SqlServer -root $root
+    $job.Refresh()
+    Set-JobProperties -root $root -JobToAlter $job -SmoObjectConnection $SqlServer
 
 #>
     [CmdletBinding()]

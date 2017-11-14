@@ -7,7 +7,14 @@ If the SQL Agent Job has an Operator associated to it then we set the notificati
 .Parameter JobToAlter
 Job whose properties we will be altering.
 .Example
-
+$JobOperatorName = $root.Operator.Name
+        if ($JobOperatorName.Length -gt 0) {
+            Write-Verbose "Operator assigned to job. Altering notification settings based on XML..." -Verbose
+            Set-JobNotification -JobToAlter $JobToAlter -root $root
+        }
+        else {
+            Write-Verbose "No Operator Information to set." -Verbose
+        }
 #>
     [CmdletBinding()]
     param
