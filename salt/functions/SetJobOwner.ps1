@@ -51,7 +51,7 @@ Set-JobOwner -JobToAlter $JobToAlter -root $root -SmoObjectConnection $SmoObject
         }
     }
     elseif ($AmISysAdmin -eq 0) {
-        Write-Warning "$whoAmI is NOT a sysadmin on the instance, job owner CANNOT be altered."
+        Write-Verbose "$whoAmI is NOT a sysadmin on the instance, job owner CANNOT be altered." -Verbose
     }
     else {
         Write-Warning "Unable to check whether or not user is sysadmin on the instance."
