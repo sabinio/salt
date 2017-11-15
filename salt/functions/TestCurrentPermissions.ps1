@@ -6,6 +6,7 @@ Test permissions of current user to verify that htey have the correct permission
 Check that the account running the deployment has the correct permissions to successfully execute a deployment.
 If an account is sysadmin then this is very straightforward.
 If account is not sysadmin then we check that the minimal permissions have been granted. Consult the readme for list of permisions, or view the SQLbelow.
+Currently the check permissions on the proxy is deactivated. This will be added at a later date. 
 .Parameter sqlInstance
 The SQL Instance we are deploying to.
 .Example
@@ -16,8 +17,11 @@ Test-CurrentPermissions -SqlInstance $SqlSvr
         [ValidateNotNullorEmpty()]
         $SqlInstance
     )
+    [bool]$ProxyCheck = $false
     $missingPermissions = @()
-    Write-Host "Yea boy!" -ForegroundColor Green -BackgroundColor DarkMagenta
+    $domain = [Environment]::UserDomainName
+    $uname = [Environment]::UserName
+    [string]$whoAmI = "$domain\$uname"
     $script = "SELECT IS_SRVROLEMEMBER('sysadmin') as 'AmISysAdmin';"
     $SQLSysAdminPermissions = $SqlInstance.ConnectionContext.ExecuteScalar($script)
     if ($SQLSysAdminPermissions -eq 1) {
@@ -72,8 +76,21 @@ Test-CurrentPermissions -SqlInstance $SqlSvr
         if ($ds.Tables[0].Rows[0]."ViewServerState" -ne 1) {
             $missingPermissions += 'GRANT VIEW SERVER STATE'
         }
+        if ($ProxyCheck -eq $true) {
+            $db = $SqlInstance.Databases.Item("msdb")
+            Write-Host "EXEC dbo.sp_enum_login_for_proxy @proxy_name = 'fred' @name = `'$WhoAmI`'" -ForegroundColor Green
+            try {
+                $ds = $db.ExecuteWithResults("EXEC dbo.sp_enum_login_for_proxy @proxy_name = 'fred' @name = `'$WhoAmI`'")    
+                Write-Host $ds.Tables[0].Rows[0].'name'.Count -ForegroundColor Green
+            }
+            catch {
+                $missingPermissions += "EXEC msdb.dbo.sp_grant_login_to_proxy  
+                @login_name = N`'$WhoAmI`',  
+                @proxy_name = N'fred';"
+            }
+        }
         if ($missingPermissions.Count -gt 0) {
-            Throw ("The following permissions need to be granted to the account running the PowerShell on the instance being deployed to `n{0}" -f ($missingPermissions -join " `n"))
+            Throw ("The following permissions need to be granted to $WhoAmI running the PowerShell on the instance being deployed to `n{0}" -f ($missingPermissions -join " `n"))
         }
     }
     else {

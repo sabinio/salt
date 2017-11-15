@@ -229,6 +229,7 @@ Here is a list of the minimal permissions required if you are not going to attem
 * GRANT SELECT on dbo.sysjobschedules
 * GRANT SELECT on dbo.sysjobs
 * ROLE MEMBER of SQLAgentOperatorRole
+* Grant the login to the RunAs proxy logins 
 
 #### MASTER Database
 * GRANT SELECT on dbo.sysprocesses
