@@ -81,6 +81,7 @@
        'Set-JobSchedules',
        'Set-JobSteps',
        'Test-JobIsIdle',
+       'Test-CurrentPermissions',
        'Test-SQLServerAgentService'
     )
  
