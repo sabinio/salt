@@ -27,11 +27,11 @@ Test-CurrentPermissions -SqlServer $SqlSvr
     [string]$whoAmI = "$domain\$uname"
     $script = "SELECT IS_SRVROLEMEMBER('sysadmin') as 'AmISysAdmin';"
     $SQLSysAdminPermissions = $SqlServer.ConnectionContext.ExecuteScalar($script)
-    if ($SQLSysAdminPermissions -eq 0) {
+    if ($SQLSysAdminPermissions -eq 1) {
         Write-Verbose "user is sysadmin on instance. No further checks required!" -Verbose
         return
     }
-    elseif ($SQLSysAdminPermissions -eq 1) {
+    elseif ($SQLSysAdminPermissions -eq 0) {
         Write-Verbose "user is not a member of the sysadmin sesrver role. Checking minimal permissions" -Verbose
         $db = $SqlServer.Databases.Item("msdb")
         $ds = $db.ExecuteWithResults("
