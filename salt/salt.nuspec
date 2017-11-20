@@ -38,6 +38,7 @@
 <file src="functions\SetJobProperties.ps1" target="functions"/>
 <file src="functions\SetJobSchedules.ps1" target="functions"/>
 <file src="functions\SetJobSteps.ps1" target="functions"/>
+<file src="functions\SetRunAsAccounts.ps1" target="functions"/>
 <file src="functions\TestJobIsIdle.ps1" target="functions"/>
 <file src="functions\TestSQLServerAgentService.ps1" target="functions"/>
 </files>

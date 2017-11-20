@@ -20,11 +20,9 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True" -Ign
     (
         [string]
         [ValidateNotNullorEmpty()]
-        $ConnectionString,
-        [Switch] $IgnoreCheck,
-        [Switch] $CheckPermissions
+        $ConnectionString
     )
-    $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString        
+    $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString      
     try {
         $SqlSvr = New-Object Microsoft.SqlServer.Management.Smo.Server $SqlConnection
         foreach ($wargh in $SqlSvr.Databases) {
@@ -38,32 +36,11 @@ Connect-SqlConnection -ConnectionString "Server=.;Integrated Security=True" -Ign
         Write-Host "Build" $SqlSvr.BuildNumber -ForegroundColor DarkGreen -BackgroundColor White
         Write-Host "Version: " $SqlSvr.Version -ForegroundColor DarkGreen -BackgroundColor White
         Write-Host "ProductLevel: " $SqlSvr.ProductLevel -ForegroundColor DarkGreen -BackgroundColor White
+        return $SqlSvr
     }
     catch {
         Write-Error $_.Exception
-        Throw
-    }
-    if ($CheckPermissions){
-        Write-Verbose "Checking permissions of account running the deployment on the Instance $($SqlSvr.Name)" -Verbose
-        Test-CurrentPermissions -SqlInstance $SqlSvr
-    }
-    if (!$IgnoreCheck) {
-        $JobServerExists = Test-SQLServerAgentService  -SmoObjectConnection $SqlSvr
-        if ($JobServerExists -eq 1) {
-            Write-Host "SQL Server Agent Job Service on $($SqlSvr.JobServer.Name) Is Up And Running!" -ForegroundColor White -BackgroundColor DarkCyan
-            return $SqlSvr
-        }
-
-        elseif($JobServerExists -eq 0) {
-            Write-Error "Check that the Agent Service is running on $($sqlSvr.JobServer) and try again."
-            Throw
-        }
-        else {
-            Write-Warning "Unable to check that the Agent Service is running on $($sqlSvr.JobServer). This may be a pmerissions issue on master.dbo.sysprocesses."
-        }
-    }
-    else {
-        return $SqlSvr
+        Throw        
     }
 }
    
