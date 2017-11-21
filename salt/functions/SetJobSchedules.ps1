@@ -35,6 +35,9 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
     [string]$JobName = $Job.Name
     $schedules = $root.Schedules
     [System.Xml.XmlElement] $schedule = $null
+    $domain = [Environment]::UserDomainName
+    $uname = [Environment]::UserName
+    [string]$whoAmI = "$domain\$uname"
     $ServerResults = @{}
     try {
         $db = New-Object Microsoft.SqlServer.Management.Smo.Database
@@ -54,9 +57,29 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
     if ($ServerResults.Count -gt 0) {
         $msg = "Dropping all schedules for job $jobName that do not exist in XML..."
         Write-Verbose $msg -Verbose
+        $ds = $db.ExecuteWithResults("SELECT IS_SRVROLEMEMBER('sysadmin') as 'AmISysAdmin';")
+        $AmISysAdmin = $ds.Tables[0].Rows[0]."AmISysAdmin"
+        if ($AmISysAdmin -eq 1) {
+            Write-Verbose "User $whoAmI is sysadmin on instance, so job schedule can be dropped irrespetive of owner." -Verbose
+        }
+        if ($AmISysAdmin -eq 0){
+            Write-Verbose "User $whoAmI not sysadmin, so need to check that they are owner of job schedules, otherwise schedules not owned by user cannot be dropped."
+            $ds = $db.ExecuteWithResults("SELECT SUSER_SID() AS SID;")
+            $CurrentUserSid = $ds.Tables[0].Rows[0]."SID"
+        }
         foreach ($ServerSchedule in $ServerResults.Keys) {
             if ($schedules.schedule.name -notcontains $ServerSchedule) {
                 try {
+                    if ($AmISysAdmin -eq 0)
+                    {
+                        $ds = $db.ExecuteWithResults("select owner_sid from sysschedules syssch where syssch.name = '$ServerSchedule'")
+                        $JobScheduleOwnerSid = $ds.Tables[0].Rows[0]."owner_sid"
+                        if ($CurrentUserSid -notmatch $JobScheduleOwnerSid)
+                        {
+                            Write-Error "User $whoAmI is not owner of Schedule $ServerSchedule. Either alter or set user executing PowerShell to sysadmin!"
+                            Throw
+                        }
+                    }
                     Write-Verbose "SQL Statement executed to drop schedule:" -Verbose
                     Write-Verbose "EXEC dbo.sp_delete_schedule @schedule_id = '$($ServerResults.Get_Item($ServerSchedule)) ',@force_delete = 1;" -Verbose
                     $db.ExecuteNonQuery("EXEC dbo.sp_delete_schedule  
@@ -71,6 +94,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             }
         }
     }
+    
     foreach ($schedule in $schedules.ChildNodes) {
         #name of schedule
         [string]$schedule_name = $schedule.Name

@@ -76,7 +76,6 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 }
                 $JobStep_Properties.ProxyName = $Step.RunAs.Name
             }
-
             if ($step.OnSuccessAction -eq "GoToStep") {
                 $OnSuccessGoToStepId = Get-GoToStepId -JobObject $job -GoToJobStep $step.OnSuccessStep
                 $JobStep_Properties.OnSuccessAction = $step.OnSuccessAction
