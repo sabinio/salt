@@ -69,7 +69,7 @@ Test-CurrentPermissions -SqlServer $SqlSvr
         if ($ds.Tables[0].Rows[0]."permissions" -ne 'sysprocesses') {
             $missingPermissions += 'GRANT SELECT ON master.dbo.sysprocesses'
         }
-        $db = $SqlServer.Databases.Item("master")
+        $db = $SqlServer.Databases.Item("msdb")
         $ds = $db.ExecuteWithResults("SELECT IS_ROLEMEMBER('SQLAgentOperatorRole') AS 'SQLAgentOperatorRole';")
         if ($ds.Tables[0].Rows[0]."SQLAgentOperatorRole" -ne 1) {
             $missingPermissions += 'sp_addrolemember @rolename = "SQLAgentOperatorRole"'
@@ -85,9 +85,9 @@ Test-CurrentPermissions -SqlServer $SqlSvr
             foreach ($proxy in $proxies) {
                 Write-Verbose "Entering proxy permission checker"
                 $db = $SqlServer.Databases.Item("msdb")
-                Write-Host "EXEC dbo.sp_enum_login_for_proxy @proxy_name = `'$proxy`' @name = `'$WhoAmI`'" 
+                Write-Host "EXEC dbo.sp_enum_login_for_proxy @proxy_name = `'$proxy`', @name = `'$WhoAmI`'" 
                 try {
-                    $ds = $db.ExecuteWithResults("EXEC dbo.sp_enum_login_for_proxy @proxy_name = `'$proxy`' @name = `'$WhoAmI`'")    
+                    $ds = $db.ExecuteWithResults("EXEC dbo.sp_enum_login_for_proxy @proxy_name = `'$proxy`', @name = `'$WhoAmI`'")    
                 }
                 catch {
                     $missingPermissions += "EXEC msdb.dbo.sp_grant_login_to_proxy  

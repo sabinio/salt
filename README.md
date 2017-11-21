@@ -179,12 +179,15 @@ The process in PowerShell is outlined exactly above:
 * Add SMO
 * Create SQL Connection ConnectionString
 * Import XML
-* Set Job Category - if it doesn't existwill create.
+* Set Job Category - if it doesn't exist will create.
 * Set Job Operator - if it doesn't exist it will create, otherwise will update.
 * Set Job - if it doesn't exist will create, otherwise will update. Inside this function we call other functions to set owner, notifications etc. Returns the SQL Agent Job as this is used by further functions.
 * Set Schedules - Will drop all schedules that relate to job and will create all jobs detailed in the XML.
 * Set Job Steps - Will drop all current job steps and will create all job steps defined in the XML.
 * Finally, Disconnect from SQL.
+
+### Is there anything optional?
+There are two Test functions that check that the account running the deployment has the necessary permissions to run the changes/has access to proxies (RunAs accounts). The other function tests that SQL Agent is up and running. 
 
 ```PowerShell
 $Local = "myLocalDevInstance2"
@@ -195,6 +198,8 @@ $JobManifestXmlFile = ".\Our First Job.xml"
 $SqlConnection = Connect-SqlConnection -ConnectionString $SqlConnectionString
 [xml] $_xml = [xml] (Get-Content -Path $JobManifestXmlFile)
 $x = Get-Xml -XmlFile $_xml
+Test-SQLServerAgentService -SqlServer $SqlConnection
+Test-CurrentPermissions -SqlServer $SqlConnection -ProxyCheck -root $x
 Set-JobCategory -SqlServer $SqlConnection -root $x
 Set-JobOperator -SqlServer $SqlConnection -root $x
 $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
@@ -235,10 +240,33 @@ Here is a list of the minimal permissions required if you are not going to attem
 * GRANT SELECT on dbo.sysprocesses
 * GRANT VIEW SERVER STATE
 
-If you wish to set the owner of the SQL Agent Job, then the account needs to be sysadmin. There are no minimal permissions. Set-JobOwner runs a check before attempting to change owner. 
+If you wish to set the owner of the SQL Agent Job, then the account needs to be sysadmin. There are no minimal permissions for this option. Set-JobOwner runs a check before attempting to change owner. 
 
 if you plan on only altering what was created through using salt, the permisisons granted by the role SQLAgentOpertorRole will be enough. If you are planning on changing objects already deployed that are owned by other accounts, and the account running hte deployment is NOT a sysmadin,  then you will need to manually alter those jobs/job schedules to be owned by the account that is runnning the deployment.
 [https://technet.microsoft.com/en-us/library/ms188283(v=sql.110).aspx](SQL Server Agent Fixed Database Roles) 
+
+Below is a sample SQL Script to add the permissions required.
+```sql
+--perms
+USE msdb
+GO 
+CREATE USER [buildaccount] FOR LOGIN [buildaccountlogin] 
+GO 
+GRANT SELECT ON dbo.sysschedules  TO [buildaccount] 
+GRANT SELECT ON dbo.sysjobschedules  TO [buildaccount] 
+GRANT SELECT ON dbo.sysjobs  TO [buildaccount] 
+EXEC msdb.dbo.sp_addrolemember @membername = 'buildaccount', @rolename = 'SQLAgentOperatorRole'
+EXEC msdb.dbo.sp_grant_login_to_proxy  
+                @login_name = N'buildaccount',  
+                @proxy_name = N'proxyaccount';
+
+use master
+GO
+CREATE USER [buildaccount] FOR LOGIN [buildaccountlogin] 
+GO
+GRANT SELECT ON master.dbo.sysprocesses  TO [buildaccount] 
+GRANT VIEW SERVER STATE TO [buildaccount] 
+```
 
 ### Checking Permissions
 Assuming that you are using Integrated Security, you can run Test-CurrentPermissions, which will verify that the account executing deployment has the correct minimum permissions on the server before executing. 
