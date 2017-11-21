@@ -221,9 +221,9 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x -dropAndRecreate
  
  ## Checking SQL Agent Service is Up and Running
  
-In the function [Connect-SqlConnection](https://github.com/sabinio/salt/blob/master/salt/functions/ConnectSqlConnection.ps1) there is a check to verify that SQL Agent Service is up and running. As this requires access to master, and some accounts may not have permissions to master, you cna override this check by including the Switch "IgnoreCheck"
+There is a check to verify that SQL Agent Service is up and running. As this requires access to master, and some accounts may not have permissions to master, you cna override this check by including the Switch "IgnoreCheck"
 
-Another check we have is that the connection to the instance is successful by querying all the database names and piping to "Out-Null". This is because of this [https://connect.microsoft.com/SQLServer/feedback/details/636401/smo-is-inconsistent-when-raising-errors-for-login-faliures#](Microsoft Connect Issue) where SMO is inconsistent with throwing login failures.
+Another check we have to make in the function [Connect-SqlConnection](https://github.com/sabinio/salt/blob/master/salt/functions/ConnectSqlConnection.ps1) is that the connection to the instance is successful by querying all the database names and piping to "Out-Null". This is because of this [https://connect.microsoft.com/SQLServer/feedback/details/636401/smo-is-inconsistent-when-raising-errors-for-login-faliures#](Microsoft Connect Issue) where SMO is inconsistent with throwing login failures.
 
 ## What Permissions Are Required on the SQL Server Instance?
 
