@@ -65,7 +65,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
         if ($AmISysAdmin -eq 0){
             Write-Verbose "User $whoAmI not sysadmin, so need to check that they are owner of job schedules, otherwise schedules not owned by user cannot be dropped."
             $ds = $db.ExecuteWithResults("SELECT SUSER_SID() AS SID;")
-            $CurrentUserSid = $ds.Tables[0].Rows[0]."SID"
+            [String]$CurrentUserSid = $ds.Tables[0].Rows[0]."SID"
         }
         foreach ($ServerSchedule in $ServerResults.Keys) {
             if ($schedules.schedule.name -notcontains $ServerSchedule) {
@@ -73,7 +73,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                     if ($AmISysAdmin -eq 0)
                     {
                         $ds = $db.ExecuteWithResults("select owner_sid from sysschedules syssch where syssch.name = '$ServerSchedule'")
-                        $JobScheduleOwnerSid = $ds.Tables[0].Rows[0]."owner_sid"
+                        [string]$JobScheduleOwnerSid = $ds.Tables[0].Rows[0]."owner_sid"
                         if ($CurrentUserSid -notmatch $JobScheduleOwnerSid)
                         {
                             Write-Error "User $whoAmI is not owner of Schedule $ServerSchedule. Either alter or set user executing PowerShell to sysadmin!"
