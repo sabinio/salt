@@ -74,7 +74,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                     {
                         $ds = $db.ExecuteWithResults("select owner_sid from sysschedules syssch where syssch.name = '$ServerSchedule'")
                         [string]$JobScheduleOwnerSid = $ds.Tables[0].Rows[0]."owner_sid"
-                        if ($CurrentUserSid -notmatch $JobScheduleOwnerSid)
+                        if(@(Compare-Object $CurrentUserSid $JobScheduleOwnerSid -SyncWindow 0).Length -gt 0)
                         {
                             Write-Error "User $whoAmI is not owner of Schedule $ServerSchedule. Either alter or set user executing PowerShell to sysadmin!"
                             Throw
