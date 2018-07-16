@@ -179,17 +179,18 @@ If not included all SQL Agent Jobs will be exported, except for the following:
                 $xmlWriter.WriteElementString("SsisServerCatalogPackage", "$($SsisProperties[3])")
                 $pattern = '(?<=ENVREFERENCE).[0-9]*'
                 [string]$EnvReference = [regex]::match($StepCommand, $pattern)
-                $EnvReference
-                $script = "SELECT [environment_name]
+                if ($EnvReference -match "[0-9]") {
+                    $script = "SELECT [environment_name]
 	                        FROM [SSISDB].[catalog].[environment_references] er
 	                        WHERE er.reference_id = $($EnvReference.Trim(' '))"
-                try {
-                    $ssisEnvironment = $SqlServer.ConnectionContext.ExecuteScalar($script) 
+                    try {
+                        $ssisEnvironment = $SqlServer.ConnectionContext.ExecuteScalar($script)
+                    }
+                    catch {
+                        throw $_.Exception
+                    }
+                    $xmlWriter.WriteElementString("SsisServerCatalogEnvironment", "$($ssisEnvironment)")
                 }
-                catch {
-                    throw $_.Exception
-                }
-                $xmlWriter.WriteElementString("SsisServerCatalogEnvironment", "$($ssisEnvironment)")
                 $xmlWriter.WriteEndElement() # <-- Closing Step
             }
             $xmlWriter.WriteElementString("OnSuccessAction", "$($step.OnSuccessAction)")
