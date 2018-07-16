@@ -45,7 +45,7 @@ If not included all SQL Agent Jobs will be exported, except for the following:
 
     }
     foreach ($job in $serverJobs) {
-        $pattern = '[^a-zA-Z]'
+        $pattern = '[^a-zA-Z0-9_]'
         Write-Verbose "Removing non-alphanumeric chars from job name, so that we can use job name as file name." -Verbose
         $FormattedJobName = $Job.Name -replace $pattern, ""
         Write-Verbose "The job name is $($job.name)" -Verbose
