@@ -38,7 +38,7 @@ If not included all SQL Agent Jobs will be exported, except for the following:
         $filePath
     )
     if ($jobName) {
-        $serverJobs = $sqlserver.JobServer.Jobs |where-object {$_.Name -eq $jobName}
+        $serverJobs = $sqlserver.JobServer.Jobs |where-object {$_.Name -like $jobName}
     }
     else {
         $serverJobs = $sqlserver.JobServer.Jobs |where-object {$_.Name -notmatch 'SSIS Server Maintenance Job|syspolicy_purge_history'}

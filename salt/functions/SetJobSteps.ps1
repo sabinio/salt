@@ -94,7 +94,6 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             }
             $JobStep_Properties.RetryAttempts = $step.RetryAttempts
             $JobStep_Properties.RetryInterval = $step.RetryInterval
-           
             if ($step.SubSystem -eq "Ssis") {
                 Write-Verbose "Setting SSIS Server for step."
                 $keys = $($step.SsisServer)
@@ -142,15 +141,15 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 }
                 try {
                     $ssisCommand = @"
-                    /ISSERVER "\"\SSISDB\$($Step.SsisServerDetails.SsisServerCatalogFolder)\$($Step.SsisServerDetails.SsisServerCatalogProject)\$($Step.SsisServerDetails.SsisServerCatalogPackage)\"" /SERVER "$($thisSsisServer)" /ENVREFERENCE $environmentReference /Par "\"`$ServerOption::LOGGING_LEVEL(Int16)\"";1 /Par "\"`$ServerOption::SYNCHRONIZED(Boolean)\"";True /CALLERINFO SQLAGENT /REPORTING E
-"@ 
+/ISSERVER "\"\SSISDB\$($Step.SsisServerDetails.SsisServerCatalogFolder)\$($Step.SsisServerDetails.SsisServerCatalogProject)\$($Step.SsisServerDetails.SsisServerCatalogPackage)\"" /SERVER "\"$($thisSsisServer)\"" /ENVREFERENCE $environmentReference /Par "\"`$ServerOption::LOGGING_LEVEL(Int16)\"";1 /Par "\"`$ServerOption::SYNCHRONIZED(Boolean)\"";True /CALLERINFO SQLAGENT /REPORTING E
+"@
                     Write-Host "This is the ssiscommand"
-                    Write-Host $ssisCommand 
-                    $JobStep_Properties.Command = $ssisCommand
+                    Write-Host $ssisCommand
+                   $JobStep_Properties.Command = $ssisCommand
                 }
                 catch {
                     throw $_.Exception
-                }   
+                }
             }
             else {
                 $JobStep_Properties.Command = $step.Command
