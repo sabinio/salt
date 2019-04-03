@@ -154,10 +154,10 @@ Say my TargetServer is defined as below:
         </TargetServer>
     </TargetServers>
 ```
-I would have to have a variable called "Local" with the value set to whatever server the TargetServer is going to be. This will then be the value of the element "Value". So in the example below the trgetserver will be "ASGLH-WL-11718".
+I would have to have a variable called "Local" with the value set to whatever server the TargetServer is going to be. This will then be the value of the element "Value". So in the example below the trgetserver will be "MyDevEnvBox".
 ```PowerShell
 $Local = "MyDevEnvBox"
-Import-Module .\ps_module\SqlAgentJobDeploy -Force
+Import-Module .\ps_module\salt -Force
 Add-Type -Path "C:\Program Files\Microsoft SQL Server\130\SDK\Assemblies\Microsoft.SqlServer.Smo.dll"
 $SqlConnectionString = "data source = .; initial catalog = master; trusted_connection = true;"
 $JobManifestXmlFile = ".\Our First Job.xml"

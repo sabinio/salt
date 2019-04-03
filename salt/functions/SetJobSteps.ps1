@@ -59,7 +59,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
         #eg if step succeeds and user wants to use "GoToStep" on Action, then have to get ID of step they want to go to from "OnSuccessStep"
         #same applies to Failures {
         try {
-            $JobStep_Properties = $job.JobSteps | Where-Object {$_.Name -eq $step.Name}
+            $JobStep_Properties = $job.JobSteps | Where-Object { $_.Name -eq $step.Name }
             $StepName = $Step.Name
             $JobStep_Properties.SubSystem = $step.SubSystem
             if ($Step.RunAs) {
@@ -67,7 +67,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 if (Test-Path variable:$RunAs) {
                     [string]$value = Get-Variable $RunAs -ValueOnly
                     Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value) -Verbose
-                    foreach ($element in $step.SelectNodes("/Job/Steps/Step/RunAs") | Where-Object {$_.Include -eq $RunAs}) { 
+                    foreach ($element in $step.SelectNodes("/Job/Steps/Step/RunAs") | Where-Object { $_.Include -eq $RunAs }) { 
                         $element.Name = $value
                     }
                 }
@@ -94,6 +94,9 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             }
             $JobStep_Properties.RetryAttempts = $step.RetryAttempts
             $JobStep_Properties.RetryInterval = $step.RetryInterval
+            if ($step.subsystem -eq "TransactSql") {
+                $JobStep_Properties.DatabaseName = $step.DatabaseName
+            }
             if ($step.SubSystem -eq "Ssis") {
                 Write-Verbose "Setting SSIS Server for step."
                 $keys = $($step.SsisServer)
@@ -102,7 +105,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                     if (Test-Path variable:$update) {
                         [string]$value = Get-Variable $update -ValueOnly
                         Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value) -Verbose
-                        foreach ($element in $step.SelectNodes("/Job/Steps/Step/SsisServer") | Where-Object {$_.Include -eq $update}) { 
+                        foreach ($element in $step.SelectNodes("/Job/Steps/Step/SsisServer") | Where-Object { $_.Include -eq $update }) { 
                             $element.Name = $value
                         }
                     }
@@ -145,7 +148,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
 "@
                     Write-Host "This is the ssiscommand"
                     Write-Host $ssisCommand
-                   $JobStep_Properties.Command = $ssisCommand
+                    $JobStep_Properties.Command = $ssisCommand
                 }
                 catch {
                     throw $_.Exception

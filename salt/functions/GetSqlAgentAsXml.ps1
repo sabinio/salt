@@ -205,6 +205,7 @@ If not included all SQL Agent Jobs will be exported, except for the following:
             }
             $xmlWriter.WriteElementString("RetryAttempts", "$($step.RetryAttempts)")
             $xmlWriter.WriteElementString("RetryInterval", "$($step.RetryInterval)")
+            $xmlWriter.WriteElementString("Databasename", "$($step.DatabaseName)")
             $xmlWriter.WriteEndElement() # <-- Closing Step
         }
         $xmlWriter.WriteEndElement() # <-- Closing Steps
