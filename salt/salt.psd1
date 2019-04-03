@@ -72,6 +72,8 @@
        'Disconnect-SqlConnection',
        'Enable-Job',
        'Enable-JobSchedules',
+       'Install-SaltNuGet',
+       'Install-SaltSmo',
        'Set-Job',
        'Set-JobCategory',
        'Set-JobNotification',
