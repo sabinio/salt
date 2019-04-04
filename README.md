@@ -269,4 +269,63 @@ GRANT VIEW SERVER STATE TO [buildaccount]
 ```
 
 ### Checking Permissions
-Assuming that you are using Integrated Security, you can run Test-CurrentPermissions, which will verify that the account executing deployment has the correct minimum permissions on the server before executing. 
+Assuming that you are using Integrated Security, you can run Test-CurrentPermissions, which will verify that the account executing deployment has the correct minimum permissions on the server before executing.
+
+### How Do I Get SMO?
+
+If the machine you are deploying from has .NET Standard 2.0 installed you can use the SMO Nuget package. As of saLt 2.0 and onwards, this can be downloaded as part of the deploy process. The function to download the Nuget package is called ```Install-SaltSmo```. You need to pass in a working folder and it will download Nuget to then download the package, and return the full path. Below is a sample script to deploy a SQL Agent Job using saLt and downloading SMO.
+
+```powershell
+Param(
+    [parameter(mandatory = $true)][string] $serverToDeployTo,
+    [parameter(mandatory = $true)][string] $ServerJobCategory,
+    [parameter(mandatory = $true)][string] $JobManifestXmlFile,
+    [parameter(mandatory = $true)][string] $serverName,
+    [parameter(mandatory = $true)][string] $DatabaseName,
+    [parameter(mandatory = $false)][switch] $DownloadSmoFromNuGet,
+    [parameter(Mandatory = $false)] [string] $sqlAdministratorLogin,
+    [parameter(Mandatory = $false)] [String] $sqlAdministratorLoginPassword
+
+)
+
+if ($PSBoundParameters.ContainsKey('sqlAdministratorLogin') -eq $true) {
+    Write-Host "Using Login AAD Password to deploy"
+    [string] $SqlConnectionString = "Server=$($serverName);Initial Catalog=$($DatabaseName);Persist Security Info=False;User ID=$($sqlAdministratorLogin);Password=$($sqlAdministratorLoginPassword);MultipleActiveResultSets=False;TrustServerCertificate=True;Connection Timeout=30;;Authentication=`"Active Directory Password`""
+}
+else {
+    Write-Host "Using Integrated Security to deploy"
+    [string] $SqlConnectionString = "integrated security=True;data source=$($serverName);initial catalog=$($DatabaseName);TrustServerCertificate=True;Connection Timeout=30;"
+}
+
+$global:serverToDeployTo = $serverToDeployTo
+$global:ServerJobCategory = $ServerJobCategory
+Import-Module .\salt -Force
+if ($PSBoundParameters.ContainsKey('DownloadSmoFromNuGet') -eq $false) {
+    $smoDll = "C:\Program Files\Microsoft SQL Server\140\SDK\Assemblies\Microsoft.SqlServer.Smo.dll"
+    If ((Test-Path $smoDll) -eq $false) {
+        $smoDll = "C:\Program Files\Microsoft SQL Server\130\SDK\Assemblies\Microsoft.SqlServer.Smo.dll"
+        If ((Test-Path $smoDll) -eq $false) {
+            Write-Error "no usable version of smo dll is found on box."
+            Throw
+        }
+    }
+}
+else {
+    Write-Host "Downloading smo from NuGet"
+    $smoDll = Install-SaltSmo -workingFolder $PSScriptRoot
+}
+[System.Reflection.Assembly]::LoadFrom($smoDll)
+If ((Test-Path $JobManifestXmlFile) -eq $false) {
+    Write-Error "job manifest file not found!"
+    Throw
+}
+$SqlConnection = Connect-SqlConnection -ConnectionString $SqlConnectionString
+[xml] $_xml = [xml] (Get-Content -Path $JobManifestXmlFile)
+$x = Get-Xml -XmlFile $_xml
+Set-JobCategory -SqlServer $SqlConnection -root $x
+Set-JobOperator -SqlServer $SqlConnection -root $x
+$sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
+Set-JobSchedules -SqlServer $SqlConnection -root $x -job $SqlAgentJob
+Set-JobSteps -SqlServer $SqlConnection -root $x -job $SqlAgentJob 
+Disconnect-SqlConnection -SqlDisconnect $SqlConnection
+```
