@@ -89,6 +89,17 @@ The structure can vary, depending on the Schedule and step type, but below is th
             <OnFailAction></OnFailAction>
             <RetryAttempts></RetryAttempts>
             <RetryInterval></RetryInterval>
+            <OutputFileName></OutputFileName>
+            <LogOutput>
+                <!-- Valid options include:
+                <AppendToLogFile/>
+                <AppendToJobHistory/>
+                <LogToTableWithOverwrite/>
+                <AppendToTableLog/>
+                <AppendAllCmdExecOutputToJobHistory/>
+                <ProvideStopProcessEvent/>
+                -->
+            </LogOutput>
         </Step>
         </Steps>
 		</Job>
