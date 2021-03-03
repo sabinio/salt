@@ -155,7 +155,7 @@ If not included all SQL Agent Jobs will be exported, except for the following:
             $xmlWriter.WriteAttributeString("Include", "RunAsAccount")
             $xmlWriter.WriteElementString("Name", "$($step.ProxyName)")
             $xmlWriter.WriteEndElement()#<- End RunAs
-            if ($step.subSystem -eq "PowerShell" -or $step.subSystem -eq "TransactSql") {
+            if (("PowerShell","TransactSql","CmdExec") -contains $step.subSystem ) {
                 $xmlWriter.WriteElementString("Command", "$($step.Command)")
             }
             if ($step.subSystem -eq "Ssis") {
