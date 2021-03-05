@@ -23,7 +23,7 @@ Get-TestJobIsIdle -job $jjob
     )
     [int32] $retry = 0
     [String] $JobCurrentRunStatus
-    Write-Verbose "Checking that job $($job.Name) is idle. If status is not idle will try again in 5 seconds. Updates during this time are every minute." -Verbose
+    Write-Verbose "Checking that job $($job.Name) is idle. If status is not idle will try again in 5 seconds. Updates during this time are every minute."
     do {
         $JobCurrentRunStatus = $null
         $JobCurrentRunStatusEnum = Get-JobCurrentRunStatus -job $job
@@ -36,10 +36,10 @@ Get-TestJobIsIdle -job $jjob
         if ($JobCurrentRunStatusEnum -eq 7) {$JobCurrentRunStatus = "value = 7. The job is in the final completion stage."}
         $retry = $retry + 5
         if ($retry % 12 -eq 0) {
-            Write-Verbose "Currently the job run status $($JobCurrentRunStatus)" -Verbose
+            Write-Verbose "Currently the job run status $($JobCurrentRunStatus)"
         }
         Start-Sleep -Seconds 5
     }
     until ($JobCurrentRunStatusEnum -eq 4)
-    Write-Verbose "Job is idle." -Verbose
+    Write-Verbose "Job is idle."
 }

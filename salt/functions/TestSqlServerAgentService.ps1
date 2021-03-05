@@ -32,7 +32,7 @@ Test-SQLServerAgentService -SqlServer $sqlSvr
     )
     $SQLServerAgentRunning = $ds.Tables[0].Rows[0]."SQLServerAgentRunning"
     if ($SQLServerAgentRunning -eq 1) {
-        Write-Verbose "SQL Server Agent Job Service on $($SqlSvr.JobServer.Name) Is Up And Running!" -Verbose
+        Write-Verbose "SQL Server Agent Job Service on $($SqlSvr.JobServer.Name) Is Up And Running!"
     }
     elseif ($SQLServerAgentRunning -eq 0) {
         Write-Error "Check that the Agent Service is running on $($sqlSvr.JobServer) and try again."

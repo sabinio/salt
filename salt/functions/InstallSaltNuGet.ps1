@@ -22,18 +22,18 @@ Function Install-SaltNuGet {
             [string] $WorkingFolder
         )
         $NuGetInstallUri = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-        Write-Verbose "Working Folder   : $WorkingFolder" -Verbose
+        Write-Verbose "Working Folder   : $WorkingFolder"
         $NugetExe = $("$WorkingFolder\nuget.exe")
         if (-not (Test-Path $NugetExe)) {
-            Write-Verbose "Cannot find nuget at path $WorkingFolder\nuget.exe" -Verbose
+            Write-Verbose "Cannot find nuget at path $WorkingFolder\nuget.exe"
             $sourceNugetExe = $NuGetInstallUri
-            Write-Verbose $sourceNugetExe -OutFile $NugetExe -Verbose
+            Write-Verbose $sourceNugetExe -OutFile $NugetExe
             Invoke-WebRequest $sourceNugetExe -OutFile "$NugetExe"
             if (-not (Test-Path $NugetExe)) { 
                 Throw "It appears that the nuget download hasn't worked."
             }
             Else {
-                Write-Verbose "Nuget Downloaded!" -Verbose
+                Write-Verbose "Nuget Downloaded!"
             }
         }
         Return $NugetExe

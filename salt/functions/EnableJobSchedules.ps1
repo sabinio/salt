@@ -23,10 +23,10 @@ enable-JobSchedules-job $jjob
         try {
             $jobScheduletoUpdate = $job.JobSchedules | Where-Object {$_.Name -eq $schedule}
             If ((Get-Date) -gt ($jobScheduletoUpdate.ActiveEndDate)) {
-                Write-Verbose "End date of schedule $($jobScheduletoUpdate.Name) is in the past. Schedule cannot be enabled." -Verbose
+                Write-Verbose "End date of schedule $($jobScheduletoUpdate.Name) is in the past. Schedule cannot be enabled."
             }
             Else {
-                Write-Verbose "Enabling Job Schedule $($jobScheduletoUpdate.Name)." -Verbose
+                Write-Verbose "Enabling Job Schedule $($jobScheduletoUpdate.Name)."
                 $jobScheduletoUpdate.IsEnabled = $true
                 $jobScheduletoUpdate.Alter()
             }

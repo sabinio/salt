@@ -34,7 +34,7 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
             Return $null
         }
         else {
-            Write-Verbose "$($Job.Name) found." -Verbose
+            Write-Verbose "$($Job.Name) found."
             return $job
         }
     }

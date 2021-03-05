@@ -27,7 +27,7 @@ Set-JobOperator -SqlServer $SqlConnection -root $x
     $JobOperatorName = $root.Operator.Name
     if ($JobOperatorName.Length -eq 0)
     {
-        Write-Verbose "No Operator Info in XML" -Verbose
+        Write-Verbose "No Operator Info in XML"
         Return
     }
     $JobOperatorEMail = $root.Operator.EMail
@@ -47,7 +47,7 @@ Set-JobOperator -SqlServer $SqlConnection -root $x
         }
         try {
             $op.Create()
-            Write-Verbose "Job Operator $op created." -Verbose
+            Write-Verbose "Job Operator $op created."
         }
         catch {
             throw $_.Exception

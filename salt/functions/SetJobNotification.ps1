@@ -9,11 +9,11 @@ Job whose properties we will be altering.
 .Example
 $JobOperatorName = $root.Operator.Name
         if ($JobOperatorName.Length -gt 0) {
-            Write-Verbose "Operator assigned to job. Altering notification settings based on XML..." -Verbose
+            Write-Verbose "Operator assigned to job. Altering notification settings based on XML..."
             Set-JobNotification -JobToAlter $JobToAlter -root $root
         }
         else {
-            Write-Verbose "No Operator Information to set." -Verbose
+            Write-Verbose "No Operator Information to set."
         }
 #>
     [CmdletBinding()]
@@ -32,22 +32,22 @@ $JobOperatorName = $root.Operator.Name
     $JobEventLogLevel = $root.Notification.SendEventLog
     $JobToAlter.EmailLevel = $JobEmailLevel
     if ($JobEmailLevel -ne "Never") {
-        Write-Verbose "Setting job to email $JobOperatorName on action $JobEmailLevel" -Verbose
+        Write-Verbose "Setting job to email $JobOperatorName on action $JobEmailLevel"
         $JobToAlter.OperatorToEmail = $JobOperatorName
     }
     $JobToAlter.PageLevel = $jobPagerLevel
     if ($JobPagerLevel -ne "Never") {
-        Write-Verbose "Setting job to page $JobOperatorName on action $jobPagerLevel" -Verbose
+        Write-Verbose "Setting job to page $JobOperatorName on action $jobPagerLevel"
         $JobToAlter.OperatorToPage = $JobOperatorName
     }
     $JobToAlter.NetSendLevel = $JobNetSendLevel
     if ($JobNetSendLevel -ne "Never") {
-        Write-Verbose "Setting job to netsend $JobOperatorName on action $JobNetSendLevel" -Verbose
+        Write-Verbose "Setting job to netsend $JobOperatorName on action $JobNetSendLevel"
         $JobToAlter.OperatorToNetSend = $JobOperatorName
     }
     $JobToAlter.EventLogLevel = $JobEventLogLevel
     if ($JobEventLogLevel -ne "Never") {
-        Write-Verbose "Setting job to write to Windows Application event log on action $JobEventLogLevel" -Verbose
+        Write-Verbose "Setting job to write to Windows Application event log on action $JobEventLogLevel"
     }
     try {
         $JobToAlter.Alter()

@@ -20,7 +20,7 @@ enable-Job-job $jjob
     try {
         $job.IsEnabled = $true
         $job.Alter()            
-        Write-Verbose "$($Job.Name) enabled." -Verbose
+        Write-Verbose "$($Job.Name) enabled."
     }
     catch {
         $_.Exception
