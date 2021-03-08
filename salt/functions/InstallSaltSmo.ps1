@@ -23,14 +23,14 @@ Directory of Nuget package.
         [string] $WorkingFolder, 
         [string] $NuGetPath
     )
-    Write-Verbose "Verbose Folder : $WorkingFolder" -Verbose
-    Write-Verbose "DataToolsVersion : $DataToolsMsBuildPackageVersion" -Verbose 
+    Write-Verbose "Verbose Folder : $WorkingFolder"
+    Write-Verbose "DataToolsVersion : $DataToolsMsBuildPackageVersion" 
     Write-Warning "If DataToolsVersion is blank latest will be used"
     if ($PSBoundParameters.ContainsKey('NuGetPath') -eq $false) {
         $NuGetExe = Install-SaltNuGet -WorkingFolder $WorkingFolder
     }
     else {
-        Write-Verbose "Skipping Nuget download..." -Verbose
+        Write-Verbose "Skipping Nuget download..."
         $NuGetExe = Join-Path $NuGetPath "nuget.exe"
         if (-not (Test-Path $($NuGetExe))) {
             Throw "NuGetpath specified, but nuget exe does not exist!"

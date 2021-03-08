@@ -32,15 +32,15 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
     $job = new-object ('Microsoft.SqlServer.Management.Smo.Agent.Job') ($SqlServer.JobServer, $jobName)
     if ($serverJobs -contains $jobName){
         if($dropAndRecreate){
-            Write-Verbose "Dropping and re-creating $jobName from $($SqlServer.JobServer)" -Verbose
+            Write-Verbose "Dropping and re-creating $jobName from $($SqlServer.JobServer)"
             try {
                 $jobDrop = $SqlServer.JobServer.Jobs | Where-Object {$_.Name -eq $JobName}
                 $jobDrop.Drop()
                 Remove-Variable -Name JobDrop
-                Write-Verbose "$JobName dropped from $($SqlServer.JobServer)" -Verbose
+                Write-Verbose "$JobName dropped from $($SqlServer.JobServer)"
                 $job.Create()
                 $job.Refresh()
-                Write-Verbose "SQL Agent Job $jobName created successfully." -Verbose
+                Write-Verbose "SQL Agent Job $jobName created successfully."
             }
             catch {
                 throw $_.Exception
@@ -51,7 +51,7 @@ $sqlAgentJob = Set-Job -SqlServer $SqlConnection -root $x
         try {
             $job.Create()
             $job.Refresh()
-            Write-Verbose "SQL Agent Job $jobName created successfully." -Verbose
+            Write-Verbose "SQL Agent Job $jobName created successfully."
         }
         catch {
             throw $_.Exception

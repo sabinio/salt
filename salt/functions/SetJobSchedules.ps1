@@ -56,11 +56,11 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
     }
     if ($ServerResults.Count -gt 0) {
         $msg = "Dropping all schedules for job $jobName that do not exist in XML..."
-        Write-Verbose $msg -Verbose
+        Write-Verbose $msg
         $ds = $db.ExecuteWithResults("SELECT IS_SRVROLEMEMBER('sysadmin') as 'AmISysAdmin';")
         $AmISysAdmin = $ds.Tables[0].Rows[0]."AmISysAdmin"
         if ($AmISysAdmin -eq 1) {
-            Write-Verbose "User $whoAmI is sysadmin on instance, so job schedule can be dropped irrespetive of owner." -Verbose
+            Write-Verbose "User $whoAmI is sysadmin on instance, so job schedule can be dropped irrespetive of owner."
         }
         if ($AmISysAdmin -eq 0){
             Write-Verbose "User $whoAmI not sysadmin, so need to check that they are owner of job schedules, otherwise schedules not owned by user cannot be dropped."
@@ -80,13 +80,13 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                             Throw
                         }
                     }
-                    Write-Verbose "SQL Statement executed to drop schedule:" -Verbose
-                    Write-Verbose "EXEC dbo.sp_delete_schedule @schedule_id = '$($ServerResults.Get_Item($ServerSchedule)) ',@force_delete = 1;" -Verbose
+                    Write-Verbose "SQL Statement executed to drop schedule:"
+                    Write-Verbose "EXEC dbo.sp_delete_schedule @schedule_id = '$($ServerResults.Get_Item($ServerSchedule)) ',@force_delete = 1;"
                     $db.ExecuteNonQuery("EXEC dbo.sp_delete_schedule  
         @schedule_id = '" + $($ServerResults.Get_Item($ServerSchedule)) + "',  
         @force_delete = 1;")
                     $msg = "Schedule $($ServerSchedule) on job $jobName deleted..."
-                    Write-Verbose $msg -Verbose 
+                    Write-Verbose $msg 
                 }
                 catch {
                     throw $_.Exception
@@ -178,7 +178,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             if ($create) {
                 try {
                     $js.Create()
-                    Write-Verbose "Job Schedule $schedule_name created successfully." -Verbose
+                    Write-Verbose "Job Schedule $schedule_name created successfully."
                     $create = $false
                     Remove-Variable -Name js
                 }
@@ -189,7 +189,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             else {
                 $js.Alter()
                 Remove-Variable -Name js
-                Write-Verbose "Job Schedule $schedule_name properties updated successfully." -Verbose
+                Write-Verbose "Job Schedule $schedule_name properties updated successfully."
             }
         }
         catch {

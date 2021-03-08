@@ -32,13 +32,13 @@ Set-JobOwner -JobToAlter $JobToAlter -root $root -SmoObjectConnection $SmoObject
     $uname = [Environment]::UserName
     [string]$whoAmI = "$domain\$uname"
     if ([string]::IsNullOrEmpty($jobOwner)) {
-        Write-Verbose 'Parameter jobOwner not included in XML document. Setting account running this task as owner of job. This requires sysadmin permissions.' -Verbose
+        Write-Verbose 'Parameter jobOwner not included in XML document. Setting account running this task as owner of job. This requires sysadmin permissions.'
         $jobOwner = $whoAmI 
     }
-    Write-Verbose "Job Owner in XML is $jobOwner" -Verbose
-    Write-Verbose "Job Owner on Server is $($JobToAlter.OwnerLoginName)" -Verbose
+    Write-Verbose "Job Owner in XML is $jobOwner"
+    Write-Verbose "Job Owner on Server is $($JobToAlter.OwnerLoginName)"
     if ($jobOwner -eq $JobToAlter.OwnerLoginName) {
-        Write-Verbose "Job Owner in XML matches Server. Not attempting to alter." -Verbose
+        Write-Verbose "Job Owner in XML matches Server. Not attempting to alter."
         Return
     }
     else {
@@ -46,11 +46,11 @@ Set-JobOwner -JobToAlter $JobToAlter -root $root -SmoObjectConnection $SmoObject
         $ds = $db.ExecuteWithResults("SELECT IS_SRVROLEMEMBER('sysadmin') as 'AmISysAdmin';")
         $AmISysAdmin = $ds.Tables[0].Rows[0]."AmISysAdmin"
         if ($AmISysAdmin -eq 1) {
-            Write-Verbose "$whoAmI is sysadmin on instance, so job owner can be altered." -Verbose
+            Write-Verbose "$whoAmI is sysadmin on instance, so job owner can be altered."
             try {
                 Write-Verbose "owner of Agent Job is$($JobToAlter.OwnerLoginName)"
                 $JobToAlter.OwnerLoginName = $jobOwner
-                Write-Verbose "Updating Job Owner to $jobOwner..." -Verbose
+                Write-Verbose "Updating Job Owner to $jobOwner..."
                 $JobToAlter.Alter()
                 $JobToAlter.Refresh()
             }

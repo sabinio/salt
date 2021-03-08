@@ -30,7 +30,7 @@ Set-JobCategory -SqlServer $SqlConnection -root $x
         $update = $var.Include
         if (Test-Path variable:$update) {
             [string]$value = Get-Variable $update -ValueOnly
-            Write-Verbose ('Setting category: {0} = {1}' -f $update, $value) -Verbose
+            Write-Verbose ('Setting category: {0} = {1}' -f $update, $value)
             $element = $root.SelectNodes("/Job/Category") | Where-Object {$_.Include -eq $update} 
             $element.Value = $value
         }
@@ -47,7 +47,7 @@ Set-JobCategory -SqlServer $SqlConnection -root $x
         $jc = new-object ('Microsoft.SqlServer.Management.Smo.Agent.JobCategory') ($SqlServer.JobServer, $jobCategory)
         try {
             $jc.Create()
-            Write-Verbose "Job Category $jc created." -Verbose 
+            Write-Verbose "Job Category $jc created." 
         }
         catch {
             throw $_.Exception
@@ -57,6 +57,6 @@ Set-JobCategory -SqlServer $SqlConnection -root $x
         }
     }
     else {
-        Write-Verbose "There is already a Job Cateogry named $jobcategory " -Verbose
+        Write-Verbose "There is already a Job Cateogry named $jobcategory "
     }
 }

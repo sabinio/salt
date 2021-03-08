@@ -34,7 +34,7 @@ $Job = Get-Job -SqlServer $SqlServer -root $root
         $update = $var.Include
         if (Test-Path variable:$update) {
             [string]$value = Get-Variable $update -ValueOnly
-            Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value) -Verbose
+            Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value)
             $element = $root.SelectNodes("/Job/TargetServers/TargetServer") | Where-Object {$_.Include -eq $update} 
             $element.Value = $value
         }
@@ -54,16 +54,16 @@ $Job = Get-Job -SqlServer $SqlServer -root $root
         $JobToAlter.description = $jobDescription
         $JobToAlter.IsEnabled = $JobEnabled
         $JobToAlter.Category = $jobCategory
-        Write-Verbose "Updating Description, Category, Job Enabled Status..." -Verbose
+        Write-Verbose "Updating Description, Category, Job Enabled Status..."
         $JobToAlter.Alter()
         $JobToAlter.Refresh()
         $JobOperatorName = $root.Operator.Name
         if ($JobOperatorName.Length -gt 0) {
-            Write-Verbose "Operator assigned to job. Altering notification settings based on XML..." -Verbose
+            Write-Verbose "Operator assigned to job. Altering notification settings based on XML..."
             Set-JobNotification -JobToAlter $JobToAlter -root $root
         }
         else {
-            Write-Verbose "No Operator Information to set." -Verbose
+            Write-Verbose "No Operator Information to set."
         }
         $TargetServersList = $JobToAlter.EnumTargetServers()
         foreach ($TargetServer in $TargetServers.ChildNodes) {
@@ -80,7 +80,7 @@ $Job = Get-Job -SqlServer $SqlServer -root $root
         Write-Verbose "Applying target servers to job $jobName"
         $JobToAlter.Alter()
         $JobToAlter.Refresh()
-        Write-Verbose "SQL Agent Job $jobName updated successfully." -Verbose
+        Write-Verbose "SQL Agent Job $jobName updated successfully."
         Return $JobToAlter
     }
     catch {
