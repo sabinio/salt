@@ -27,7 +27,8 @@ Function Install-SaltNuGet {
         if (-not (Test-Path $NugetExe)) {
             Write-Verbose "Cannot find nuget at path $WorkingFolder\nuget.exe"
             $sourceNugetExe = $NuGetInstallUri
-            Write-Verbose $sourceNugetExe -OutFile $NugetExe
+            Write-Verbose "$sourceNugetExe -OutFile $NugetExe" 
+
             Invoke-WebRequest $sourceNugetExe -OutFile "$NugetExe"
             if (-not (Test-Path $NugetExe)) { 
                 Throw "It appears that the nuget download hasn't worked."
