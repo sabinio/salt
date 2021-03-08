@@ -94,6 +94,16 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             }
             $JobStep_Properties.RetryAttempts = $step.RetryAttempts
             $JobStep_Properties.RetryInterval = $step.RetryInterval
+            if ($step.OutputFileName) {
+                $JobStep_Properties.OutputFileName = $step.OutputFileName
+            }
+            if ($step.LogOutput -and $step.LogOutput.HasChildNodes) {
+                $flags = [string]::Join(", ", $step.LogOutput.ChildNodes.Name)
+                [Microsoft.SqlServer.Management.Smo.Agent.JobStepFlags]$flags_enum = 0
+                if ([Microsoft.SqlServer.Management.Smo.Agent.JobStepFlags]::TryParse($flags, [ref]$flags_enum)) {
+                    $JobStep_Properties.JobStepFlags = $flags_enum
+                }
+            }
             if ($step.subsystem -eq "TransactSql") {
                 $JobStep_Properties.DatabaseName = $step.DatabaseName
             }

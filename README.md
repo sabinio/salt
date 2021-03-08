@@ -21,77 +21,88 @@ Please refer to [MSDN](https://msdn.microsoft.com/en-us/library/microsoft.sqlser
 The structure can vary, depending on the Schedule and step type, but below is the basic structure of every element that can be used.
 ```XML
 <Job>
-		<Name></Name>                           	
-		<Description></Description>
-		<Enabled></Enabled>
-		<Category Include="">
-            <Value></Value>
-        </Category>
-		<TargetServers>
-			<TargetServer Include="">
-				<Name></Name>
-			</TargetServer>
-		</TargetServers>
-		<Operator>
-			<Name></Name>
-			<EMail></EMail>
-            <NetSend></NetSend>
-            <Page></Page>
-		</Operator>
-		<Notification>
-			<SendEmail></SendEmail>
-			<SendPage></SendPage>
-			<SendNetSend></SendNetSend>
-			<SendEventLog></SendEventLog>
-            </Notification>
-            <Schedules>
-        <Schedule>
-            <Name> Schedule</Name>
-            <Enabled></Enabled>
-            <Frequency>
-                <Type></Type>
-                <Interval></Interval>
-            </Frequency>
-             <DailyFrequency>
-                <Every></Every>
-                <Interval></Interval>
-                <StartHour></StartHour>
-                <StartMinute></StartMinute>
-                <StartSecond></StartSecond>
-                <EndHour></EndHour>
-                <EndMinute></EndMinute>
-                <EndSecond></EndSecond>
-            </DailyFrequency>
-            <StartDate></StartDate>
-            <EndDate></EndDate>
-        </Schedule>
-        </Schedules>
-        <Steps>
-        <Step>
-        <Step>
+    <Name></Name>
+    <Description></Description>
+    <Enabled></Enabled>
+    <Category Include="">
+        <Value></Value>
+    </Category>
+    <TargetServers>
+        <TargetServer Include="">
             <Name></Name>
-            <SubSystem></SubSystem>
-            <RunAs Include="RunAsAccount">
-                <Name></Name>
-            </RunAs>
-            <SsisServer Include="IntegrationServicesCatalogServer">
-                <Name></Name>
-            </SsisServer>
-            <SsisServerDetails Include="">
-                <SsisServerCatalog></SsisServerCatalog>
-                <SsisServerCatalogFolder></SsisServerCatalogFolder>
-                <SsisServerCatalogProject></SsisServerCatalogProject>
-                <SsisServerCatalogPackage></SsisServerCatalogPackage>
-                <SsisServerCatalogEnvironment></SsisServerCatalogEnvironment>
-            </SsisServerDetails>
+        </TargetServer>
+    </TargetServers>
+    <Operator>
+        <Name></Name>
+        <EMail></EMail>
+        <NetSend></NetSend>
+        <Page></Page>
+    </Operator>
+    <Notification>
+        <SendEmail></SendEmail>
+        <SendPage></SendPage>
+        <SendNetSend></SendNetSend>
+        <SendEventLog></SendEventLog>
+        </Notification>
+        <Schedules>
+    <Schedule>
+        <Name> Schedule</Name>
+        <Enabled></Enabled>
+        <Frequency>
+            <Type></Type>
+            <Interval></Interval>
+        </Frequency>
+         <DailyFrequency>
+            <Every></Every>
+            <Interval></Interval>
+            <StartHour></StartHour>
+            <StartMinute></StartMinute>
+            <StartSecond></StartSecond>
+            <EndHour></EndHour>
+            <EndMinute></EndMinute>
+            <EndSecond></EndSecond>
+        </DailyFrequency>
+        <StartDate></StartDate>
+        <EndDate></EndDate>
+    </Schedule>
+    </Schedules>
+    <Steps>
+    <Step>
+    <Step>
+        <Name></Name>
+        <SubSystem></SubSystem>
+        <RunAs Include="RunAsAccount">
+            <Name></Name>
+        </RunAs>
+        <SsisServer Include="IntegrationServicesCatalogServer">
+            <Name></Name>
+        </SsisServer>
+        <SsisServerDetails Include="">
+            <SsisServerCatalog></SsisServerCatalog>
+            <SsisServerCatalogFolder></SsisServerCatalogFolder>
+            <SsisServerCatalogProject></SsisServerCatalogProject>
+            <SsisServerCatalogPackage></SsisServerCatalogPackage>
             <SsisServerCatalogEnvironment></SsisServerCatalogEnvironment>
-            <OnSuccessAction></OnSuccessAction>
-            <OnFailAction></OnFailAction>
-            <RetryAttempts></RetryAttempts>
-            <RetryInterval></RetryInterval>
-        </Step>
-        </Steps>
-		</Job>
+        </SsisServerDetails>
+        <SsisServerCatalogEnvironment></SsisServerCatalogEnvironment>
+        <OnSuccessAction></OnSuccessAction>
+        <OnFailAction></OnFailAction>
+        <RetryAttempts></RetryAttempts>
+        <RetryInterval></RetryInterval>
+        <OutputFileName></OutputFileName>
+        <LogOutput>
+            <!-- Valid options include:
+            <AppendToLogFile/>
+            <AppendToJobHistory/>
+            <LogToTableWithOverwrite/>
+            <AppendToTableLog/>
+            <AppendAllCmdExecOutputToJobHistory/>
+            <ProvideStopProcessEvent/>
+            -->
+        </LogOutput>
+    </Step>
+    </Steps>
+</Job>
 ```
 
 ## That's a lot of XML...
