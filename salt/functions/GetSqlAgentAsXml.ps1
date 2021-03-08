@@ -155,7 +155,7 @@ If not included all SQL Agent Jobs will be exported, except for the following:
             $xmlWriter.WriteAttributeString("Include", "RunAsAccount")
             $xmlWriter.WriteElementString("Name", "$($step.ProxyName)")
             $xmlWriter.WriteEndElement()#<- End RunAs
-            if ($step.subSystem -eq "PowerShell" -or $step.subSystem -eq "TransactSql") {
+            if (("PowerShell","TransactSql","CmdExec") -contains $step.subSystem ) {
                 $xmlWriter.WriteElementString("Command", "$($step.Command)")
             }
             if ($step.subSystem -eq "Ssis") {
@@ -206,6 +206,16 @@ If not included all SQL Agent Jobs will be exported, except for the following:
             $xmlWriter.WriteElementString("RetryAttempts", "$($step.RetryAttempts)")
             $xmlWriter.WriteElementString("RetryInterval", "$($step.RetryInterval)")
             $xmlWriter.WriteElementString("Databasename", "$($step.DatabaseName)")
+            $xmlWriter.WriteElementString("OutputFileName", "$($step.OutputFileName)")
+            $xmlWriter.WriteStartElement("LogOutput")
+            $StepOutputFlags = $step.JobStepFlags.ToString().Split(@(", "), 0) -cnotmatch "None"
+            if ($StepOutputFlags.Count -gt 0) {
+                foreach ($StepOutputFlag in $StepOutputFlags) {
+                    $xmlWriter.WriteStartElement($StepOutputFlag)
+                    $xmlWriter.WriteEndElement()
+                }
+            }
+            $xmlWriter.WriteEndElement() # <-- Closing LogOutput
             $xmlWriter.WriteEndElement() # <-- Closing Step
         }
         $xmlWriter.WriteEndElement() # <-- Closing Steps
