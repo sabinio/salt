@@ -11,7 +11,7 @@ Function Set-RunAsAccounts{
             $RunAs = $Step.RunAs.Include
             if (Test-Path variable:$RunAs) {
                 [string]$value = Get-Variable $RunAs -ValueOnly
-                Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value) -Verbose
+                Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value)
                 foreach ($element in $step.SelectNodes("/Job/Steps/Step/RunAs") | Where-Object {$_.Include -eq $RunAs}) { 
                     $element.Name = $value
                 }

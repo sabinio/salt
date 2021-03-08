@@ -21,7 +21,7 @@ Disable-JobSchedules -job $jjob
     foreach ($schedule in $schedules) {
         try {
             $jobScheduletoUpdate = $job.JobSchedules | Where-Object {$_.Name -eq $schedule}
-            Write-Verbose "Disabling Job Schedule $($jobScheduletoUpdate.Name)." -Verbose
+            Write-Verbose "Disabling Job Schedule $($jobScheduletoUpdate.Name)."
             $jobScheduletoUpdate.IsEnabled = $false
             $jobScheduletoUpdate.Alter()
         }

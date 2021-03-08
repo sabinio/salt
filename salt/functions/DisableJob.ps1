@@ -20,7 +20,7 @@ Disable-Job-job $jjob
     try {
         $job.IsEnabled = $false
         $job.Alter()
-        Write-Verbose "$($job.Name) disabled." -Verbose
+        Write-Verbose "$($job.Name) disabled."
     }
     catch {
         $_.Exception        

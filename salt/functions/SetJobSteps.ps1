@@ -41,7 +41,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             $StepName = $step.Name
             $JobStep = New-Object ('Microsoft.SqlServer.Management.Smo.Agent.JobStep') ($job, $StepName)
             $JobStep.Create()
-            Write-Verbose "Blank step $StepName Created" -Verbose
+            Write-Verbose "Blank step $StepName Created"
             $job.Refresh()
         }
         catch {
@@ -66,7 +66,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 $RunAs = $Step.RunAs.Include
                 if (Test-Path variable:$RunAs) {
                     [string]$value = Get-Variable $RunAs -ValueOnly
-                    Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value) -Verbose
+                    Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value)
                     foreach ($element in $step.SelectNodes("/Job/Steps/Step/RunAs") | Where-Object { $_.Include -eq $RunAs }) { 
                         $element.Name = $value
                     }
@@ -114,7 +114,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                     $update = $var.Include
                     if (Test-Path variable:$update) {
                         [string]$value = Get-Variable $update -ValueOnly
-                        Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value) -Verbose
+                        Write-Verbose ('Setting variable: {0} = {1}' -f $update, $value)
                         foreach ($element in $step.SelectNodes("/Job/Steps/Step/SsisServer") | Where-Object { $_.Include -eq $update }) { 
                             $element.Name = $value
                         }
@@ -128,7 +128,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 }
                 $thisSsisServer = $step.SsisServer.Name
                 $step = Set-IscVariables -SsisStep $Step
-                Write-Verbose "Step $stepName is a Ssis step. Connecting to SSIS Instance to verify the catalog exists. If it does will assume everything else required exists." -Verbose
+                Write-Verbose "Step $stepName is a Ssis step. Connecting to SSIS Instance to verify the catalog exists. If it does will assume everything else required exists."
                 $script = "SELECT 'exists'
                 FROM ssisdb.CATALOG.folders folder
                 INNER JOIN ssisdb.CATALOG.projects project on project.folder_id = folder.folder_id
@@ -137,7 +137,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 $checkSsisExists = $SqlServer.ConnectionContext.ExecuteScalar($script)
                 # if ($checkSsisExists -ne "exists") {
                 #     $msg = "Either Folder " + $Step.SsisServerDetails.SsisServerCatalogFolder + " or Project " + $Step.SsisServerDetails.SsisServerCatalogProject + " does not exist. Cannot fill variables for ssisCommand correctly. Please deploy all SSIS Projects first "
-                #     Write-Verbose $msg -Verbose
+                #     Write-Verbose $msg
                 #     Throw $msg;
                 # }
                 $script = "SELECT er.reference_id
@@ -169,7 +169,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             }
             $JobStep_Properties.Alter()
             $JobStep_Properties.Refresh()
-            Write-Verbose "Successfully Updated properties for Step $StepName." -Verbose
+            Write-Verbose "Successfully Updated properties for Step $StepName."
         }
         catch {
             throw $_.Exception

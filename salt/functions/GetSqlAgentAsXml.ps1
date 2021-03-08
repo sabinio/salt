@@ -46,11 +46,11 @@ If not included all SQL Agent Jobs will be exported, except for the following:
     }
     foreach ($job in $serverJobs) {
         $pattern = '[^a-zA-Z0-9_]'
-        Write-Verbose "Removing non-alphanumeric chars from job name, so that we can use job name as file name." -Verbose
+        Write-Verbose "Removing non-alphanumeric chars from job name, so that we can use job name as file name."
         $FormattedJobName = $Job.Name -replace $pattern, ""
-        Write-Verbose "The job name is $($job.name)" -Verbose
+        Write-Verbose "The job name is $($job.name)"
         $FileOutput = Join-Path $filePath "$($FormattedJobName).xml"
-        Write-Verbose "File output - $FileOutput" -Verbose
+        Write-Verbose "File output - $FileOutput"
         # Create The Document
         $XmlWriter = New-Object System.XMl.XmlTextWriter($FileOutput, $Null)
         # Set The Formatting

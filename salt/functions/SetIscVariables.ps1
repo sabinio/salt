@@ -53,13 +53,13 @@ Set-IscVariables -SsisStep $Step
             if ($null -ne $currentVar2.SsisServerCatalogPackage) {
                 $element.SsisServerCatalogPackage = $currentVar2.SsisServerCatalogPackage
             }
-            Write-Verbose "SSIS Server Details for Job Step $($element.Include) updated." -Verbose
+            Write-Verbose "SSIS Server Details for Job Step $($element.Include) updated."
             Return $ssisStep
         }
         else {
-            Write-Verbose "SSIS Server Details for Job Step $($update) unchanged." -Verbose
-            Write-Verbose $ssisStep.SsisServerDetails.SsisServerCatalogFolder -Verbose
+            Write-Verbose "SSIS Server Details for Job Step $($update) unchanged."
+            Write-Verbose $ssisStep.SsisServerDetails.SsisServerCatalogFolder
             Return $ssisStep
         }
     }
-    #Write-Verbose $ssisStep.Job.Steps.Step.SsisServerDetails -Verbose
+    #Write-Verbose $ssisStep.Job.Steps.Step.SsisServerDetails
