@@ -160,38 +160,69 @@ If not included all SQL Agent Jobs will be exported, except for the following:
             }
             if ($step.subSystem -eq "Ssis") {
                 $StepCommand = $Step.Command
-                $pattern = '(?<=SERVER ).\w([^\s]+)'
-                [String]$SsisServer = [regex]::match($StepCommand, $pattern)
-                $xmlWriter.WriteStartElement("SsisServer")
-                $xmlWriter.WriteAttributeString("Include", "IntegrationServicesCatalogServer")
-                $xmlWriter.WriteElementString("Name", "$($ssisServer)")
-                $xmlWriter.WriteEndElement() #<- Closing SsisServer
-                $xmlWriter.WriteStartElement("SsisServerDetails")
-                $stepNameRedacted = $step.name.replace(" ", "")
-                $stepNameRedacted = $stepNameRedacted.replace('[^a-zA-Z]', "")
-                $xmlWriter.WriteAttributeString("Include", "$($stepNameRedacted)")
-                $pattern = 'SSISDB.*.dtsx'
-                [String]$ssisCatalog = [regex]::match($StepCommand, $pattern)
-                $SsisProperties = $ssisCatalog.Split('\')
-                $xmlWriter.WriteElementString("SsisServerCatalog", "$($SsisProperties[0])")
-                $xmlWriter.WriteElementString("SsisServerCatalogFolder", "$($SsisProperties[1])")
-                $xmlWriter.WriteElementString("SsisServerCatalogProject", "$($SsisProperties[2])")
-                $xmlWriter.WriteElementString("SsisServerCatalogPackage", "$($SsisProperties[3])")
-                $pattern = '(?<=ENVREFERENCE).[0-9]*'
-                [string]$EnvReference = [regex]::match($StepCommand, $pattern)
-                if ($EnvReference -match "[0-9]") {
-                    $script = "SELECT [environment_name]
-	                        FROM [SSISDB].[catalog].[environment_references] er
-	                        WHERE er.reference_id = $($EnvReference.Trim(' '))"
-                    try {
-                        $ssisEnvironment = $SqlServer.ConnectionContext.ExecuteScalar($script)
+              
+                
+                foreach ($segment in $StepCommand -split "\s+(?=[/])") {
+                    if ($segment -match "\/([^\s]+) (.*)") {
+                        
+                        if ($matches[1] -eq "ISSERVER") {
+                            Write-Verbose "ISSERVER = $($matches[2])"
+                            $xmlWriter.WriteStartElement("SsisServerDetails")
+                            $stepNameRedacted = $step.name.replace(" ", "")
+                            $stepNameRedacted = $stepNameRedacted.replace('[^a-zA-Z]', "")
+                            $xmlWriter.WriteAttributeString("Include", "$($stepNameRedacted)")
+                            $pattern = 'SSISDB.*.dtsx'
+                            [String]$ssisCatalog = [regex]::match($matches[2], $pattern)
+                            $SsisProperties = $ssisCatalog.Split('\')
+                            $xmlWriter.WriteElementString("SsisServerCatalog", $SsisProperties[0])
+                            $xmlWriter.WriteElementString("SsisServerCatalogFolder", $SsisProperties[1])
+                            $xmlWriter.WriteElementString("SsisServerCatalogProject", $SsisProperties[2])
+                            $xmlWriter.WriteElementString("SsisServerCatalogPackage", $SsisProperties[3])
+                            $xmlWriter.WriteEndElement()
+                        }
+                        elseif ($matches[1] -eq "SERVER") {
+                            Write-Verbose "SERVER = $($matches[2])"
+                            $xmlWriter.WriteStartElement("SsisServer")
+                            $xmlWriter.WriteAttributeString("Include", "IntegrationServicesCatalogServer")
+                            $xmlWriter.WriteElementString("Name", $matches[2])
+                            $xmlWriter.WriteEndElement() #<- Closing SsisServer
+                        }
+                        elseif ($matches[1] -eq "PAR") {
+                            Write-Verbose "PAR = $($matches[2])"
+                            $xmlWriter.WriteElementString("SSISParameter", $matches[2])
+                        }
+                        elseif ($matches[1] -eq "CALLERINFO") {
+                            Write-Host "callerInfo = $($matches[2])"
+                            $xmlWriter.WriteElementString("SSISCallerInfo", $matches[2])
+                        }
+                        elseif ($matches[1] -eq "REPORTING") {
+                            Write-Host "reporting = $($matches[2])"
+                            $xmlWriter.WriteElementString("SSISReporting", $matches[2])
+                        }
+                        elseif ($matches[1] -eq "ENVREFERENCE") {
+                            $EnvReference = $matches[2]
+                            Write-Host "ENVREFERENCE = $EnvReference "
+                            
+                            if ($EnvReference -match "[0-9]") {
+                                $script = "SELECT [environment_name]
+                                        FROM [SSISDB].[catalog].[environment_references] er
+                                        WHERE er.reference_id = $EnvReference"
+                                try {
+                                    $ssisEnvironment = $SqlServer.ConnectionContext.ExecuteScalar($script)
+                                }
+                                catch {
+                                    throw
+                                }
+                                $xmlWriter.WriteElementString("SsisServerCatalogEnvironment", $ssisEnvironment)
+                            }
+                        }
+                        else {
+                            write-host "unkown option $($matches[1]) $segment"
+                        }
                     }
-                    catch {
-                        throw $_.Exception
-                    }
-                    $xmlWriter.WriteElementString("SsisServerCatalogEnvironment", "$($ssisEnvironment)")
+                    else { write-host "unrecognised argument $segment" }
+                
                 }
-                $xmlWriter.WriteEndElement() # <-- Closing Step
             }
             $xmlWriter.WriteElementString("OnSuccessAction", "$($step.OnSuccessAction)")
             if ($step.OnSuccessAction -eq "GoToStep") {

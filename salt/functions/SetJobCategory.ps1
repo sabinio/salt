@@ -1,5 +1,5 @@
 Function Set-JobCategory {
-      <#
+    <#
 .Synopsis
 Create or modify SQL Agent Job Category.
 .Description
@@ -28,14 +28,16 @@ Set-JobCategory -SqlServer $SqlConnection -root $x
     $keys = $($root.Category)
     foreach ($var in $keys) {
         $update = $var.Include
-        if (Test-Path variable:$update) {
-            [string]$value = Get-Variable $update -ValueOnly
-            Write-Verbose ('Setting category: {0} = {1}' -f $update, $value)
-            $element = $root.SelectNodes("/Job/Category") | Where-Object {$_.Include -eq $update} 
-            $element.Value = $value
-        }
-        else {
-            $missingVariables += $update
+        if (-not [string]::IsNullOrEmpty($update)) {
+            if (Test-Path variable:$update) {
+                [string]$value = Get-Variable $update -ValueOnly
+                Write-Verbose ('Setting category: {0} = {1}' -f $update, $value)
+                $element = $root.SelectNodes("/Job/Category") | Where-Object { $_.Include -eq $update } 
+                $element.Value = $value
+            }
+            else {
+                $missingVariables += $update
+            }
         }
     }
     if ($missingVariables.Count -gt 0) {

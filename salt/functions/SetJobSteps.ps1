@@ -106,6 +106,7 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
             }
             if ($step.subsystem -eq "TransactSql") {
                 $JobStep_Properties.DatabaseName = $step.DatabaseName
+                $JobStep_Properties.Command = $step.Command
             }
             if ($step.SubSystem -eq "Ssis") {
                 Write-Verbose "Setting SSIS Server for step."
@@ -126,9 +127,10 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 if ($missingVariables.Count -gt 0) {
                     throw ('Ssis Server is not set in the current scope (but are defined in the xml): {0}' -f ($missingVariables -join " `n"))
                 }
+              
                 $thisSsisServer = $step.SsisServer.Name
                 $step = Set-IscVariables -SsisStep $Step
-                Write-Verbose "Step $stepName is a Ssis step. Connecting to SSIS Instance to verify the catalog exists. If it does will assume everything else required exists."
+                Write-Verbose "Step $stepName is a Ssis step. Connecting to SSIS Instance to verify the catalog exists. If it does will assume everything else required exists." 
                 $script = "SELECT 'exists'
                 FROM ssisdb.CATALOG.folders folder
                 INNER JOIN ssisdb.CATALOG.projects project on project.folder_id = folder.folder_id
@@ -137,39 +139,42 @@ Disconnect-SqlConnection -SqlDisconnect $SqlConnection
                 $checkSsisExists = $SqlServer.ConnectionContext.ExecuteScalar($script)
                 # if ($checkSsisExists -ne "exists") {
                 #     $msg = "Either Folder " + $Step.SsisServerDetails.SsisServerCatalogFolder + " or Project " + $Step.SsisServerDetails.SsisServerCatalogProject + " does not exist. Cannot fill variables for ssisCommand correctly. Please deploy all SSIS Projects first "
-                #     Write-Verbose $msg
+                #     Write-Verbose $msg -Verbose
                 #     Throw $msg;
                 # }
-                $script = "SELECT er.reference_id
-                FROM ssisdb.CATALOG.environment_references er
-                INNER JOIN ssisdb.CATALOG.projects p ON p.project_id = er.project_id
-                WHERE er.environment_name = '$($Step.SsisServerDetails.SsisServerCatalogEnvironment)'
-                    AND p.NAME = '$($Step.SsisServerDetails.SsisServerCatalogProject)'"
-                Write-Host $script
-                try {
+            
+                $ssisCommand = [Collections.Generic.List[string]]::new()
+                $ssisCommand.Add(('/ISSERVER "\"\SSISDB\{0}\{1}\{2}\""' -f $Step.SsisServerDetails.SsisServerCatalogFolder , $Step.SsisServerDetails.SsisServerCatalogProject, $Step.SsisServerDetails.SsisServerCatalogPackage ))
+                $ssisCommand.Add(('/SERVER "\"{0}\""' -f $thisSsisServer))
+                if ($null -ne $Step.SsisServerCatalogEnvironment) {
+                    $script = "SELECT er.reference_id
+                        FROM ssisdb.CATALOG.environment_references er
+                        INNER JOIN ssisdb.CATALOG.projects p ON p.project_id = er.project_id
+                        WHERE er.environment_name = '$($Step.SsisServerDetails.SsisServerCatalogEnvironment)'
+                            AND p.NAME = '$($Step.SsisServerDetails.SsisServerCatalogProject)'"
+                    Write-Host $script
                     $environmentReference = $SqlServer.ConnectionContext.ExecuteScalar($script) 
+                    $ssisCommand.Add("/ENVREFERENCE $environmentReference")
                 }
-                catch {
-                    throw $_.Exception
+                
+                foreach ($Parameter in $step.SSISParameter) {
+                    $ssisCommand.Add("/Par $Parameter")
                 }
-                try {
-                    $ssisCommand = @"
-/ISSERVER "\"\SSISDB\$($Step.SsisServerDetails.SsisServerCatalogFolder)\$($Step.SsisServerDetails.SsisServerCatalogProject)\$($Step.SsisServerDetails.SsisServerCatalogPackage)\"" /SERVER "\"$($thisSsisServer)\"" /ENVREFERENCE $environmentReference /Par "\"`$ServerOption::LOGGING_LEVEL(Int16)\"";1 /Par "\"`$ServerOption::SYNCHRONIZED(Boolean)\"";True /CALLERINFO SQLAGENT /REPORTING E
-"@
-                    Write-Host "This is the ssiscommand"
-                    Write-Host $ssisCommand
-                    $JobStep_Properties.Command = $ssisCommand
-                }
-                catch {
-                    throw $_.Exception
-                }
+                $ssisCommand.Add("/CALLERINFO $($Step.SSISCallerInfo)")
+                $ssisCommand.Add("/REPORTING $($Step.SSISReporting)")
+                Write-Host "This is the ssiscommand"
+                $ssisFullCommand = $ssisCommand -join " "
+                Write-Host $ssisFullCommand
+                $JobStep_Properties.Command = $ssisFullCommand
+
+
             }
             else {
                 $JobStep_Properties.Command = $step.Command
             }
             $JobStep_Properties.Alter()
             $JobStep_Properties.Refresh()
-            Write-Verbose "Successfully Updated properties for Step $StepName."
+            Write-Verbose "Successfully Updated properties for Step $StepName."    
         }
         catch {
             throw $_.Exception
